@@ -15,8 +15,21 @@ public class Board {
         this.board = board;
     }
 
-    private void initialize() {
-        board  = new Checker[BoardUtil.MAX_ROWS][BoardUtil.MAX_COLS];
+    public Board(String state) {
+    	board = new Checker[BoardUtil.MAX_ROWS][BoardUtil.MAX_COLS];
+    	char[] boardState = state.toCharArray();
+    	int boardStateIndex = 0;
+    	
+    	for (int rowIndex = BoardUtil.MAX_ROWS - 1; rowIndex >= 0; --rowIndex) {
+            for (int colIndex = 0; colIndex < BoardUtil.MAX_COLS; ++colIndex) {
+                board[rowIndex][colIndex] = boardState[boardStateIndex] == 'E' ? null : new Checker(Color.fromSymbol(boardState[boardStateIndex]));
+                boardStateIndex++;
+            }
+        }
+	}
+
+	private void initialize() {
+        board = new Checker[BoardUtil.MAX_ROWS][BoardUtil.MAX_COLS];
         BoardUtil.fillRow(board, 0, Color.BLACK);
         BoardUtil.fillRow(board, 1, Color.BLACK);
         BoardUtil.fillRow(board, 2, Color.BLACK);
@@ -144,6 +157,34 @@ public class Board {
 
     public Checker getPiece(int row, int col) {
         return board[row][col];
+    }
+    
+    /**
+     * Board state is stored as a String. The format is
+     * 
+     * G(B|R|E)^64
+     * 
+     * The first character is a G which stands for "game". Then the next 64 characters
+     * can either be one of B, for "black", indicating the square is occupied by a black checker, R, indicating the square is occupied
+     * by a red checker, or E, indicating the square is empty. The first character after the G corresponds to square (0,0) in the 
+     * internal board matrix. The next character is (0,1), and so on and so on.
+     */
+    public String getBoardState() {
+    	StringBuilder stringBuilder = new StringBuilder();
+    	
+    	for (int rowIndex = BoardUtil.MAX_ROWS - 1; rowIndex >= 0; --rowIndex) {
+            for (int colIndex = 0; colIndex < BoardUtil.MAX_COLS; ++colIndex) {
+                char cellChar = 'E';
+
+                if (board[rowIndex][colIndex] != null) {
+                    cellChar = board[rowIndex][colIndex].getColor() == Color.BLACK ? Color.BLACK.getSymbol() : Color.RED.getSymbol();
+                }
+
+                stringBuilder.append(cellChar);
+            }
+        }
+    	
+    	return stringBuilder.toString();
     }
 
     @Override
