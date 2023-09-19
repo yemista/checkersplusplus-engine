@@ -3,22 +3,16 @@ package com.checkersplusplus.engine.net;
 import java.util.List;
 
 import com.checkersplusplus.engine.Coordinate;
-import com.checkersplusplus.engine.Move;
+import com.checkersplusplus.engine.moves.Move;
 
 public class ServerMove {
-    private Move move;
-    private List<Coordinate> capturedPieces;
+    private List<Coordinate> moves;
 
-    public ServerMove(Move move, List<Coordinate> capturedPieces) {
-        this.move = move;
-        this.capturedPieces = capturedPieces;
+    public ServerMove(List<Coordinate> moves) {
+        this.moves = moves;
     }
 
-    public Move getMove() {
-        return move;
-    }
-
-    public List<Coordinate> getCapturedPieces() {
-        return capturedPieces;
+    public List<Coordinate> getMoves() {
+        return moves;
     }
 }

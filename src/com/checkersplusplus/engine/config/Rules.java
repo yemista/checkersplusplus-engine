@@ -1,4 +1,4 @@
-package com.checkersplusplus.engine;
+package com.checkersplusplus.engine.config;
 
 public class Rules {
     private boolean allowRainbowJumps;

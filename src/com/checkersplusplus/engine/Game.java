@@ -47,8 +47,9 @@ public class Game {
 
         for (int rowCounter = 0; rowCounter < BoardUtil.MAX_ROWS; ++rowCounter) {
             for (int colCounter = 0; colCounter < BoardUtil.MAX_COLS; ++colCounter) {
-                if (board.getPiece(rowCounter, colCounter) != null
-                        && board.getPiece(rowCounter, colCounter).getColor() == opponent) {
+            	Coordinate location = new Coordinate(rowCounter, colCounter);
+            	
+            	if (board.getPiece(location) != null && board.getPiece(location).getColor() == opponent) {
                     opponentFound = true;
                     break;
                 }
