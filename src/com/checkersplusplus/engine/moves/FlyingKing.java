@@ -24,7 +24,7 @@ public class FlyingKing extends Move {
 			return false;	
 		}
 		
-		return false;
+		return Math.abs(start.getCol() - end.getCol()) == Math.abs(start.getRow() - end.getRow());
 	}
 	
 	@Override
@@ -34,12 +34,45 @@ public class FlyingKing extends Move {
 
 	@Override
 	public Coordinate getCapturedPieceLocation() {
-		// TODO Auto-generated method stub
-		return null;
+		if (end.getCol() > start.getCol() && end.getRow() > start.getRow()) {
+			return new Coordinate(end.getCol() - 1, end.getRow() - 1);
+		} else if (end.getCol() > start.getCol() && end.getRow() < start.getRow()) {
+			return new Coordinate(end.getCol() - 1, end.getRow() + 1);
+		} else if (end.getCol() < start.getCol() && end.getRow() > start.getRow()) {
+			return new Coordinate(end.getCol() + 1, end.getRow() - 1);
+		} else {
+			return new Coordinate(end.getCol() + 1, end.getRow() + 1);
+		}
 	}
 
-	public boolean findObstructionsOnPath(Board workingBoard) {
-		// TODO Auto-generated method stub
+	public boolean findObstructionsOnPath(Board board) {
+		int colDirection = 0;
+		int rowDirection = 0;
+		
+		if (end.getCol() > start.getCol() && end.getRow() > start.getRow()) {
+			colDirection = 1;
+			rowDirection = 1;
+		} else if (end.getCol() > start.getCol() && end.getRow() < start.getRow()) {
+			colDirection = 1;
+			rowDirection = -1;
+		} else if (end.getCol() < start.getCol() && end.getRow() > start.getRow()) {
+			colDirection = -1;
+			rowDirection = 1;
+		} else {
+			colDirection = -1;
+			rowDirection = -1;
+		}
+		
+		Coordinate squareBeforeEnd = new Coordinate(end.getCol() + (colDirection * -1), end.getRow() * (rowDirection * -1));
+		
+		for (Coordinate checkLocation = new Coordinate(start.getCol() + colDirection, start.getRow() + rowDirection); 
+				!checkLocation.equals(squareBeforeEnd);
+				checkLocation = new Coordinate(start.getCol() + colDirection, start.getRow() + rowDirection)) {
+			if (board.getPiece(checkLocation) != null) {
+				return true;
+			}
+		}
+		
 		return false;
 	}
 

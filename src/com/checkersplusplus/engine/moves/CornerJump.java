@@ -21,6 +21,10 @@ public class CornerJump extends Move {
 			return false;
 		}
 		
+		if (start.getCol() != 1 && start.getCol() != 6) {
+			return false;
+		}
+		
 		if (Math.abs(end.getRow() - start.getRow()) != 2) {
 			return false;
 		}

@@ -1,11 +1,14 @@
 package com.checkersplusplus.engine;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.checkersplusplus.engine.enums.Color;
 import com.checkersplusplus.engine.enums.MoveType;
+import com.checkersplusplus.engine.moves.FlyingKing;
 import com.checkersplusplus.engine.moves.Move;
 import com.checkersplusplus.engine.pieces.Checker;
+import com.checkersplusplus.engine.pieces.King;
 import com.checkersplusplus.engine.util.BoardUtil;
 
 public class Board {
@@ -57,27 +60,44 @@ public class Board {
     	
 		boolean isValid = false;
     	Board workingBoard = new Board(board.getBoardState());
+    	List<Checker> capturedPieces = new ArrayList<>();
     	
-    	for (int moveNum = 0; moveNum < moves.size(); ++moveNum) {
-    		Move move = moves.get(moveNum);
-	    	isValid = move.isValidMoveType();
+    	for (Move move : moves) {
+    		isValid = move.isValidMoveType();
 	    	
 	        if (isValid == false) {
 	        	return false;
 	        }
 	        
-	        Checker capturedPiece = workingBoard.commitMove(move);
+	        if (moveInWrongDirection(workingBoard, move)) {
+	        	return false;
+	        }
 	        
-	        // King cannot move again unless it captures a piece.
 	        if (move.getMoveType() == MoveType.FLYING_KING) {
-	        	if (capturedPiece == null && moveNum != moves.size() - 1) {
+	        	FlyingKing flyingKing = (FlyingKing) move;
+	        	
+	        	if (flyingKing.findObstructionsOnPath(workingBoard)) {
 	        		return false;
 	        	}
-	        } 
-	        
-	        if (moveMustCapturePiece(move) && capturedPiece == null) {
-		        return false;	
 	        }
+	        
+	        Checker capturedPiece = workingBoard.commitMove(move);
+	        
+	        if (capturedPiece != null) {
+	        	capturedPieces.add(capturedPiece);
+	        }
+	        
+	        if (capturedPiece == null) {
+	        	// King cannot fly again unless it captures a piece.
+	        	if (move.getMoveType() == MoveType.FLYING_KING) {
+	        		return false;
+	        	}
+	        	
+	        	// Jump, rainbow jump, and corner jump must capture a piece
+	        	if (moveMustCapturePiece(move)) {
+			        return false;	
+		        }
+	        } 
 	        
 	        String updatedBoardState = workingBoard.getBoardState();
 	        workingBoard = new Board(updatedBoardState);
@@ -86,7 +106,34 @@ public class Board {
         return isValid;
     }
 	
-    public static boolean validateMovesAreConnected(List<Move> moves) {
+	/**
+	 * Check if piece moves in correct direction based on color. Black pieces move up while red move down.
+	 * If the piece is a King, it can go in any direction.
+	 */
+    public static boolean moveInWrongDirection(Board board, Move move) {
+		Checker piece = board.getPiece(move.getStart());
+    	
+		if (piece instanceof King) {
+			return false;
+		}
+		
+		// Special case where we have a horizontal rainbow jump
+		if (move.getMoveType() == MoveType.RAINBOW_JUMP && move.getStart().getRow() == move.getEnd().getRow()) {
+			return false;
+		}
+		
+		if (piece.getColor() == Color.BLACK) {
+			return move.getEnd().getRow() > move.getStart().getRow();
+		}
+		
+		if (piece.getColor() == Color.RED) {
+			return move.getEnd().getRow() < move.getStart().getRow();
+		}
+		
+    	return true;
+	}
+
+	public static boolean validateMovesAreConnected(List<Move> moves) {
 		Coordinate lastEnd = null;
 		
 		for (Move move : moves) {

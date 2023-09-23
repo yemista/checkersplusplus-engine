@@ -26,15 +26,6 @@ public class Jump extends Move {
 			return false;
 		}
 		
-//		Coordinate opponentLocation = getCapturedPieceLocation(board, start, end);
-//		Checker capturedPiece = board.getPiece(opponentLocation);
-//		
-//		if (capturedPiece == null) {
-//			return false;
-//		}
-//		
-//		// Valid jump MUST capture a piece
-//		return capturedPiece.getColor() != playerPiece.getColor();
 		return true;
 	}
 	
