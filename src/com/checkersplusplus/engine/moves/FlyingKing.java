@@ -4,6 +4,7 @@ import com.checkersplusplus.engine.Board;
 import com.checkersplusplus.engine.Coordinate;
 import com.checkersplusplus.engine.enums.MoveType;
 import com.checkersplusplus.engine.pieces.Checker;
+import com.checkersplusplus.engine.pieces.King;
 import com.checkersplusplus.engine.util.MoveUtil;
 
 public class FlyingKing extends Move {
@@ -16,6 +17,13 @@ public class FlyingKing extends Move {
 		if (!MoveUtil.commonValidation(board, start, end)) {
 			return false;
 		}
+		
+		Checker playerPiece = board.getPiece(start);
+		
+		if (!(playerPiece instanceof King)) {
+			return false;	
+		}
+		
 		return false;
 	}
 	

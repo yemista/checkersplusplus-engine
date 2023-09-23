@@ -4,10 +4,8 @@ import java.util.List;
 
 import com.checkersplusplus.engine.enums.Color;
 import com.checkersplusplus.engine.enums.MoveType;
-import com.checkersplusplus.engine.moves.FlyingKing;
 import com.checkersplusplus.engine.moves.Move;
 import com.checkersplusplus.engine.pieces.Checker;
-import com.checkersplusplus.engine.pieces.King;
 import com.checkersplusplus.engine.util.BoardUtil;
 
 public class Board {
@@ -72,12 +70,6 @@ public class Board {
 	        
 	        // King cannot move again unless it captures a piece.
 	        if (move.getMoveType() == MoveType.FLYING_KING) {
-	        	FlyingKing flyingKingMove = (FlyingKing) move;
-	        	
-	        	if (flyingKingMove.findObstructionsOnPath(workingBoard)) {
-	        		return false;
-	        	}
-	        	
 	        	if (capturedPiece == null && moveNum != moves.size() - 1) {
 	        		return false;
 	        	}

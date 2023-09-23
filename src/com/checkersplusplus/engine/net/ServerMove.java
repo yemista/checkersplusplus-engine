@@ -3,7 +3,6 @@ package com.checkersplusplus.engine.net;
 import java.util.List;
 
 import com.checkersplusplus.engine.Coordinate;
-import com.checkersplusplus.engine.moves.Move;
 
 public class ServerMove {
     private List<Coordinate> moves;
