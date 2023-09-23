@@ -5,28 +5,22 @@ import com.checkersplusplus.engine.Coordinate;
 import com.checkersplusplus.engine.enums.Color;
 import com.checkersplusplus.engine.enums.MoveType;
 import com.checkersplusplus.engine.pieces.Checker;
+import com.checkersplusplus.engine.util.MoveUtil;
 
 public class ForwardMove extends Move {
 
-	protected ForwardMove(Board board, Coordinate start, Coordinate end) {
-		super(MoveType.FORWARD_MOVE, board, start, end);
+	public ForwardMove(Coordinate start, Coordinate end) {
+		super(MoveType.FORWARD_MOVE, start, end);
 	}
 
 	@Override
-	public void commitMove() {
-		Checker playerPiece = board.getPiece(start);
-		board.removePiece(start);
-		board.placePiece(playerPiece, end);
-	}
-
-	@Override
-	protected Checker capturedPiece() {
+	public Coordinate getCapturedPieceLocation() {
 		// Forward move can never capture a piece.
 		return null;
 	}
 
 	@Override
-	public boolean isValid() {
+	public boolean isValidMoveType() {
 		return true;
 	}
 
@@ -36,7 +30,7 @@ public class ForwardMove extends Move {
 	 * independent or team color. The ending square must be empty for the move to be valid.
 	 */
 	public static boolean isValidForwardMove(Board board, Coordinate start, Coordinate end) {
-		if (!commonValidation(board, start, end)) {
+		if (!MoveUtil.commonValidation(board, start, end)) {
 			return false;
 		}
 		

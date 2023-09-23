@@ -5,7 +5,12 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.stream.Stream;
+
 import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import com.checkersplusplus.engine.Board;
 import com.checkersplusplus.engine.Coordinate;
@@ -14,129 +19,49 @@ import com.checkersplusplus.engine.pieces.Checker;
 
 public class ForwardMoveTest {
 
-	@Test
-	public void testForwardMoveRightForRed() {
+	@ParameterizedTest
+	@MethodSource("validForwardMoves")
+	public void testForwardMove(int startCol, int startRow, int endCol, int endRow, Color color) {
 		Board board = new Board();
-		Coordinate start = new Coordinate(2, 5);
-		Coordinate end = new Coordinate(1, 4);
+		Coordinate start = new Coordinate(startCol, startRow);
+		Coordinate end = new Coordinate(endCol, endRow);
 		Checker playerPiece = board.getPiece(start);
 		assertNotNull(playerPiece);
-		assertEquals(playerPiece.getColor(), Color.RED);
+		assertEquals(playerPiece.getColor(), color);
 		assertTrue(ForwardMove.isValidForwardMove(board, start, end));
 	}
 	
-	@Test
-	public void testForwardMoveLeftForRed() {
-		Board board = new Board();
-		Coordinate start = new Coordinate(2, 5);
-		Coordinate end = new Coordinate(3, 4);
-		Checker playerPiece = board.getPiece(start);
-		assertNotNull(playerPiece);
-		assertEquals(playerPiece.getColor(), Color.RED);
-		assertTrue(ForwardMove.isValidForwardMove(board, start, end));
+	private static Stream<Arguments> validForwardMoves() {
+	    return Stream.of(
+	      Arguments.of(2, 2, 3, 3, Color.BLACK),
+	      Arguments.of(2, 2, 1, 3, Color.BLACK),
+	      Arguments.of(1, 5, 0, 4, Color.RED),
+	      Arguments.of(1, 5, 2, 4, Color.RED)
+	    );
 	}
 	
-	@Test
-	public void testForwardMoveRightBlockedForRed() {
+	@ParameterizedTest
+	@MethodSource("invalidForwardMoves")
+	public void testInvalidForwardMove(int startCol, int startRow, int endCol, int endRow, Color color) {
 		Board board = new Board();
-		Coordinate start = new Coordinate(3, 6);
-		Coordinate end = new Coordinate(2, 5);
+		Coordinate start = new Coordinate(startCol, startRow);
+		Coordinate end = new Coordinate(endCol, endRow);
 		Checker playerPiece = board.getPiece(start);
 		assertNotNull(playerPiece);
-		assertEquals(playerPiece.getColor(), Color.RED);
+		assertEquals(playerPiece.getColor(), color);
 		assertFalse(ForwardMove.isValidForwardMove(board, start, end));
-		board.removePiece(end);
-		assertTrue(ForwardMove.isValidForwardMove(board, start, end));
 	}
 	
-	@Test
-	public void testForwardMoveLeftBlockedForRed() {
-		Board board = new Board();
-		Coordinate start = new Coordinate(3, 6);
-		Coordinate end = new Coordinate(4, 5);
-		Checker playerPiece = board.getPiece(start);
-		assertNotNull(playerPiece);
-		assertEquals(playerPiece.getColor(), Color.RED);
-		assertFalse(ForwardMove.isValidForwardMove(board, start, end));
-		board.removePiece(end);
-		assertTrue(ForwardMove.isValidForwardMove(board, start, end));
-	}
-	
-	@Test
-	public void testForwardMoveWithInvalidCoordinatesForRed() {
-		Board board = new Board();
-		Coordinate start = new Coordinate(3, 6);
-		Checker playerPiece = board.getPiece(start);
-		assertNotNull(playerPiece);
-		assertEquals(playerPiece.getColor(), Color.RED);
-		Coordinate end1 = new Coordinate(5, 4);
-		assertFalse(ForwardMove.isValidForwardMove(board, start, end1));
-		Coordinate end2 = new Coordinate(1, 4);
-		assertFalse(ForwardMove.isValidForwardMove(board, start, end2));
-		Coordinate end3 = new Coordinate(3, 5);
-		assertFalse(ForwardMove.isValidForwardMove(board, start, end3));
-	}
-	
-	@Test
-	public void testForwardMoveRightForBlack() {
-		Board board = new Board();
-		Coordinate start = new Coordinate(1, 2);
-		Coordinate end = new Coordinate(2, 3);
-		Checker playerPiece = board.getPiece(start);
-		assertNotNull(playerPiece);
-		assertEquals(playerPiece.getColor(), Color.BLACK);
-		assertTrue(ForwardMove.isValidForwardMove(board, start, end));
-	}
-	
-	@Test
-	public void testForwardMoveLeftForBlack() {
-		Board board = new Board();
-		Coordinate start = new Coordinate(3, 2);
-		Coordinate end = new Coordinate(4, 3);
-		Checker playerPiece = board.getPiece(start);
-		assertNotNull(playerPiece);
-		assertEquals(playerPiece.getColor(), Color.BLACK);
-		assertTrue(ForwardMove.isValidForwardMove(board, start, end));
-	}
-	
-	@Test
-	public void testForwardMoveRightBlockedForBlack() {
-		Board board = new Board();
-		Coordinate start = new Coordinate(1, 0);
-		Coordinate end = new Coordinate(2, 1);
-		Checker playerPiece = board.getPiece(start);
-		assertNotNull(playerPiece);
-		assertEquals(playerPiece.getColor(), Color.BLACK);
-		assertFalse(ForwardMove.isValidForwardMove(board, start, end));
-		board.removePiece(end);
-		assertTrue(ForwardMove.isValidForwardMove(board, start, end));
-	}
-	
-	@Test
-	public void testForwardMoveLeftBlockedForBlack() {
-		Board board = new Board();
-		Coordinate start = new Coordinate(1, 0);
-		Coordinate end = new Coordinate(0, 1);
-		Checker playerPiece = board.getPiece(start);
-		assertNotNull(playerPiece);
-		assertEquals(playerPiece.getColor(), Color.BLACK);
-		assertFalse(ForwardMove.isValidForwardMove(board, start, end));
-		board.removePiece(end);
-		assertTrue(ForwardMove.isValidForwardMove(board, start, end));
-	}
-	
-	@Test
-	public void testForwardMoveWithInvalidCoordinatesForBlack() {
-		Board board = new Board();
-		Coordinate start = new Coordinate(3, 2);
-		Checker playerPiece = board.getPiece(start);
-		assertNotNull(playerPiece);
-		assertEquals(playerPiece.getColor(), Color.BLACK);
-		Coordinate end1 = new Coordinate(3, 3);
-		assertFalse(ForwardMove.isValidForwardMove(board, start, end1));
-		Coordinate end2 = new Coordinate(1, 4);
-		assertFalse(ForwardMove.isValidForwardMove(board, start, end2));
-		Coordinate end3 = new Coordinate(5, 4);
-		assertFalse(ForwardMove.isValidForwardMove(board, start, end3));
+	private static Stream<Arguments> invalidForwardMoves() {
+	    return Stream.of(
+	      Arguments.of(1, 1, 0, 2, Color.BLACK),
+	      Arguments.of(1, 1, 2, 2, Color.BLACK),
+	      Arguments.of(1, 1, 3, 3, Color.BLACK),
+	      Arguments.of(1, 1, 1, 2, Color.BLACK),
+	      Arguments.of(2, 6, 1, 5, Color.RED),
+	      Arguments.of(2, 6, 3, 5, Color.RED),
+	      Arguments.of(2, 6, 4, 4, Color.RED),
+	      Arguments.of(2, 6, 2, 5, Color.RED)
+	    );
 	}
 }

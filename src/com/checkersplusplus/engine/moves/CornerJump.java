@@ -4,36 +4,17 @@ import com.checkersplusplus.engine.Board;
 import com.checkersplusplus.engine.Coordinate;
 import com.checkersplusplus.engine.enums.MoveType;
 import com.checkersplusplus.engine.pieces.Checker;
+import com.checkersplusplus.engine.util.MoveUtil;
 
 public class CornerJump extends Move {
 
-	protected CornerJump(Board board, Coordinate start, Coordinate end) {
-		super(MoveType.CORNER_JUMP, board, start, end);
+	public CornerJump(Coordinate start, Coordinate end) {
+		super(MoveType.CORNER_JUMP, start, end);
 		// TODO Auto-generated constructor stub
 	}
 
 	public static boolean isValidCornerJump(Board board, Coordinate start, Coordinate end) {
-		if (!commonValidation(board, start, end)) {
-			return false;
-		}
-		
-		if (!validCornerJump(board, start, end)) {
-			return false;
-		}
-		
-		Checker playerPiece = board.getPiece(start);
-		Coordinate opponentPieceLocation = getCapturedPieceLocation(board, start, end);
-		
-		if (opponentPieceLocation == null) {
-			return false;
-		}
-		
-		Checker opponentPiece = board.getPiece(opponentPieceLocation);
-		return opponentPiece.getColor() != playerPiece.getColor();
-	}
-
-	private static boolean validCornerJump(Board board, Coordinate start, Coordinate end) {
-		if (!commonValidation(board, start, end)) {
+		if (!MoveUtil.commonValidation(board, start, end)) {
 			return false;
 		}
 		
@@ -45,18 +26,11 @@ public class CornerJump extends Move {
 			return false;
 		}
 		
-		Checker playerPiece = board.getPiece(start);
-		Coordinate opponentPieceLocation = getCapturedPieceLocation(board, start, end);
-		
-		if (opponentPieceLocation == null) {
-			return false;
-		}
-		
-		Checker opponentPiece = board.getPiece(opponentPieceLocation);
-		return opponentPiece.getColor() != playerPiece.getColor();
+		return true;
 	}
 
-	private static Coordinate getCapturedPieceLocation(Board board, Coordinate start, Coordinate end) {
+	@Override
+	public Coordinate getCapturedPieceLocation() {
 		if (start.getRow() < end.getRow()) {
 			if (start.getCol() == 6) {
 				return new Coordinate(7, start.getRow() + 1);
@@ -81,30 +55,7 @@ public class CornerJump extends Move {
 	}
 
 	@Override
-	public void commitMove() {
-		Checker playerPiece = board.getPiece(start);
-		board.removePiece(start);
-		board.placePiece(playerPiece, end);
-		Coordinate opponentLocation = getCapturedPieceLocation(board, start, end);	
-		
-		if (opponentLocation != null) {
-			board.removePiece(opponentLocation);
-		}
-	}
-
-	@Override
-	protected Checker capturedPiece() {
-		Coordinate opponentLocation = getCapturedPieceLocation(board, start, end);
-		
-		if (opponentLocation == null) {
-			return null;
-		}
-		
-		return board.getPiece(opponentLocation);
-	}
-	
-	@Override
-	public boolean isValid() {
+	public boolean isValidMoveType() {
 		return true;
 	}
 

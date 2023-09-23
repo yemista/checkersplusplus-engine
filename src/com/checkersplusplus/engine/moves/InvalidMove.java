@@ -7,22 +7,17 @@ import com.checkersplusplus.engine.pieces.Checker;
 
 public class InvalidMove extends Move {
 
-	protected InvalidMove(Board board, Coordinate start, Coordinate end) {
-		super(MoveType.INVALID, board, start, end);
+	public InvalidMove(Coordinate start, Coordinate end) {
+		super(MoveType.INVALID, start, end);
 	}
 
 	@Override
-	public void commitMove() {
-		
-	}
-
-	@Override
-	protected Checker capturedPiece() {
+	public Coordinate getCapturedPieceLocation() {
 		return null;
 	}
 
 	@Override
-	public boolean isValid() {
+	public boolean isValidMoveType() {
 		return false;
 	}
 }

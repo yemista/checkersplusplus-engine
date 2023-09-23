@@ -6,40 +6,23 @@ import com.checkersplusplus.engine.enums.Color;
 import com.checkersplusplus.engine.enums.Direction;
 import com.checkersplusplus.engine.enums.MoveType;
 import com.checkersplusplus.engine.pieces.Checker;
+import com.checkersplusplus.engine.util.MoveUtil;
 
 public class RainbowJump extends Move {
 
-	protected RainbowJump(Board board, Coordinate start, Coordinate end) {
-		super(MoveType.RAINBOW_JUMP, board, start, end);
+	public RainbowJump(Coordinate start, Coordinate end) {
+		super(MoveType.RAINBOW_JUMP, start, end);
 	}
 
 	public static boolean isValidRainbowJump(Board board, Coordinate start, Coordinate end) {
-		if (!commonValidation(board, start, end)) {
+		if (!MoveUtil.commonValidation(board, start, end)) {
 			return false;
 		}
 		
-		if (!isValidHorizontalJump(start, end)) {
-			return false;
-		}
-		
-		Checker playerPiece = board.getPiece(start);
-		Direction direction = playerPiece.getColor() == Color.BLACK ? Direction.UP : Direction.DOWN;
-		
-		if (!isValidVerticalJump(start, end, direction)) {
-			return false;
-		}
-		
-		Coordinate opponentPieceLocation = getCapturedPieceLocation(board, start, end);
-		
-		if (opponentPieceLocation == null) {
-			return false;
-		}
-		
-		Checker opponentPiece = board.getPiece(opponentPieceLocation);
-		return opponentPiece.getColor() != playerPiece.getColor();
+		return isValidHorizontalJump(start, end) || isValidVerticalJump(start, end);
 	}
 	
-	private static Coordinate getCapturedPieceLocationFromVerticalJump(Board board, Coordinate start, Coordinate end) {
+	private static Coordinate getCapturedPieceLocationFromVerticalJump(Coordinate start, Coordinate end) {
 		Coordinate opponentLocation = null;
 		
 		if (end.getRow() > start.getRow()) {
@@ -51,7 +34,7 @@ public class RainbowJump extends Move {
 		return opponentLocation;
 	}
 
-	private static Coordinate getCapturedPieceLocationFromHorizontalJump(Board board, Coordinate start, Coordinate end) {
+	private static Coordinate getCapturedPieceLocationFromHorizontalJump(Coordinate start, Coordinate end) {
 		Coordinate opponentLocation = null;
 		
 		if (end.getCol() > start.getCol()) {
@@ -70,53 +53,28 @@ public class RainbowJump extends Move {
                     && (end.getCol() == toColLeft || end.getCol() == toColRight);
     }
 
-    private static boolean isValidVerticalJump(Coordinate start, Coordinate end, Direction direction) {
-        int toRow = start.getRow() + (direction.getNumericValue() * 4);
-        return end.getRow() == toRow && end.getCol() == start.getCol();
+    private static boolean isValidVerticalJump(Coordinate start, Coordinate end) {
+        int toRowUp = start.getRow() + 4;
+        int toRowDown = start.getRow() - 4;
+        return (end.getRow() == toRowUp || end.getRow() == toRowDown)
+        		&& end.getCol() == start.getCol();
     }
 
-	@Override
-	public void commitMove() {
-		Checker playerPiece = board.getPiece(start);
-		board.removePiece(start);
-		board.placePiece(playerPiece, end);
-		Coordinate opponentLocation = getCapturedPieceLocation(board, start, end);	
-		
-		if (opponentLocation != null) {
-			board.removePiece(opponentLocation);
-		}
-	}
-
-	private static Coordinate getCapturedPieceLocation(Board board, Coordinate start, Coordinate end) {
-		Checker playerPiece = board.getPiece(start);
-		Coordinate opponentPieceLocation = null;
-		
+    @Override
+	public Coordinate getCapturedPieceLocation() {
 		if (isValidHorizontalJump(start, end)) {
-			opponentPieceLocation = getCapturedPieceLocationFromHorizontalJump(board, start, end);
+			return getCapturedPieceLocationFromHorizontalJump(start, end);
 		}
 		
-		Direction movementDirection = playerPiece.getColor() == Color.BLACK ? Direction.UP : Direction.DOWN;
-		
-		if (isValidVerticalJump(start, end, movementDirection)) {
-			opponentPieceLocation = getCapturedPieceLocationFromVerticalJump(board, start, end);
+		if (isValidVerticalJump(start, end)) {
+			return getCapturedPieceLocationFromVerticalJump(start, end);
 		}
 		
-		return opponentPieceLocation;
+		return null;
 	}
 
 	@Override
-	protected Checker capturedPiece() {
-		Coordinate opponentLocation = getCapturedPieceLocation(board, start, end);
-		
-		if (opponentLocation == null) {
-			return null;
-		}
-		
-		return board.getPiece(opponentLocation);
-	}
-
-	@Override
-	public boolean isValid() {
+	public boolean isValidMoveType() {
 		return true;
 	}
 }

@@ -1,8 +1,17 @@
 package com.checkersplusplus.engine.pieces;
 
+import com.checkersplusplus.engine.Board;
 import com.checkersplusplus.engine.Coordinate;
 import com.checkersplusplus.engine.enums.Color;
 import com.checkersplusplus.engine.enums.Direction;
+import com.checkersplusplus.engine.enums.MoveType;
+import com.checkersplusplus.engine.moves.CornerJump;
+import com.checkersplusplus.engine.moves.FlyingKing;
+import com.checkersplusplus.engine.moves.ForwardMove;
+import com.checkersplusplus.engine.moves.InvalidMove;
+import com.checkersplusplus.engine.moves.Jump;
+import com.checkersplusplus.engine.moves.Move;
+import com.checkersplusplus.engine.moves.RainbowJump;
 import com.checkersplusplus.engine.util.BoardUtil;
 
 public class Checker {
@@ -11,64 +20,51 @@ public class Checker {
     public Checker(Color color) {
         this.color = color;
     }
+    
+    public Move createMove(Board board, Coordinate start, Coordinate end) {
+    	MoveType type = findMoveType(board, start, end);
+    	Move move = null;
+    	
+    	switch (type) {
+    	case FORWARD_MOVE:
+    		move = new ForwardMove(start, end);
+    	case JUMP:
+    		move = new Jump(start, end);
+    	case RAINBOW_JUMP:
+    		move = new RainbowJump(start, end);
+    	case CORNER_JUMP:
+    		move = new CornerJump(start, end);
+    	case FLYING_KING:
+    		move = new FlyingKing(start, end);
+    	default:
+    		move = new InvalidMove(start, end);
+    	}
+    	
+		return move;
+    }
+    
+    protected MoveType findMoveType(Board board, Coordinate start, Coordinate end) {
+		if (ForwardMove.isValidForwardMove(board, start, end)) {
+			return MoveType.FORWARD_MOVE;
+		}
+    	
+    	if (Jump.isValidJump(board, start, end)) {
+			return MoveType.JUMP;
+		}
+		
+		if (RainbowJump.isValidRainbowJump(board, start, end)) {
+			return MoveType.RAINBOW_JUMP;
+		}
+		
+		if (CornerJump.isValidCornerJump(board, start, end)) {
+			return MoveType.CORNER_JUMP;
+		}
+		
+		return MoveType.INVALID;
+	}
 
     private Color getOpponentColor() {
         return getColor() == Color.BLACK ? Color.RED : Color.BLACK;
-    }
-
-    public boolean isValidRainbowJump(Coordinate from, Coordinate to) {
-        return isValidRainbowJump(from, to, getVerticalDirection());
-    }
-
-    public boolean isValidCornerJump(Coordinate from, Coordinate to) {
-        return isValidCornerJump(from, to, getVerticalDirection());
-    }
-
-    public boolean isValidJump(Coordinate from, Coordinate to) {
-        return isValidJump(from, to, getVerticalDirection());
-    }
-
-    public boolean isValidMove(Coordinate from, Coordinate to) {
-        return isValidMove(from, to, getVerticalDirection());
-    }
-
-    private boolean isValidRainbowJump(Coordinate from, Coordinate to, Direction direction) {
-        return isValidVerticalJump(from, to, direction) || isValidHorizontalJump(from, to);
-    }
-
-    private boolean isValidCornerJump(Coordinate from, Coordinate to, Direction direction) {
-        int rowsMoved = direction.getNumericValue() * 2;
-        int newRow = from.getRow() + rowsMoved;
-
-        if (from.getCol() != to.getCol()) {
-            return false;
-        }
-
-        if (from.getCol() != BoardUtil.MAX_COLS - 2 && from.getCol() != 1) {
-            return false;
-        }
-
-        return from.getCol() == to.getCol() && newRow == to.getRow();
-    }
-
-    protected boolean isValidJump(Coordinate from, Coordinate to, Direction direction) {
-        return isDiagonalMove(from, to, direction, 2);
-    }
-
-    protected boolean isValidMove(Coordinate from, Coordinate to, Direction direction) {
-        return isDiagonalMove(from, to, direction, 1);
-    }
-
-    private boolean isValidHorizontalJump(Coordinate from, Coordinate to) {
-        int toColLeft = from.getCol() - 4;
-        int toColRight = from.getCol() + 4;
-        return from.getRow() == to.getRow()
-                    && (to.getCol() == toColLeft || to.getCol() == toColRight);
-    }
-
-    private boolean isValidVerticalJump(Coordinate from, Coordinate to, Direction direction) {
-        int toRow = from.getRow() + (direction.getNumericValue() * 4);
-        return to.getRow() == toRow && to.getCol() == from.getCol();
     }
 
     private boolean isDiagonalMove(Coordinate from, Coordinate to, Direction direction, int scale) {
@@ -80,19 +76,4 @@ public class Checker {
         return color;
     }
 
-    private Direction getVerticalDirection() {
-        if (color == Color.BLACK) {
-            return Direction.UP;
-        } else {
-            return Direction.DOWN;
-        }
-    }
-
-    public Checker copyOf() {
-        if (this instanceof King) {
-            return new King(this.color);
-        }
-
-        return new Checker(this.color);
-    }
 }

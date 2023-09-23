@@ -15,4 +15,14 @@ public class Coordinate {
     public int getRow() {
         return row;
     }
+    
+    @Override
+    public boolean equals(Object other) {
+    	if (other instanceof Coordinate) {
+    		Coordinate otherCoordinate = (Coordinate) other;
+    		return this.getCol() == otherCoordinate.getCol() && this.getRow() == otherCoordinate.getRow();
+    	}
+    	
+    	return false;
+    }
 }

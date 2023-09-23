@@ -9,7 +9,7 @@ public class BoardUtil {
     public static final int MAX_COLS = 8;
 
     public static void fillRow(Checker[][] board, int row, Color color) {
-        int col = row % 2 == 0 ? 1 : 0;
+        int col = row % 2 == 1 ? 1 : 0;
 
         for (int colIndex = col; colIndex < MAX_COLS; colIndex += 2) {
             board[row][colIndex] = new Checker(color);

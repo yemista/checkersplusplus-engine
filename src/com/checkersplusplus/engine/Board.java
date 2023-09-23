@@ -3,8 +3,11 @@ package com.checkersplusplus.engine;
 import java.util.List;
 
 import com.checkersplusplus.engine.enums.Color;
+import com.checkersplusplus.engine.enums.MoveType;
+import com.checkersplusplus.engine.moves.FlyingKing;
 import com.checkersplusplus.engine.moves.Move;
 import com.checkersplusplus.engine.pieces.Checker;
+import com.checkersplusplus.engine.pieces.King;
 import com.checkersplusplus.engine.util.BoardUtil;
 
 public class Board {
@@ -12,10 +15,6 @@ public class Board {
 
     public Board() {
         initialize();
-    }
-
-    protected Board(Checker[][] board) {
-        this.board = board;
     }
 
     public Board(String state) {
@@ -30,6 +29,17 @@ public class Board {
             }
         }
 	}
+    
+    /**
+     * Clears all pieces off the board. Should only be used for testing.
+     */
+    public void clear() {
+    	for (int rowIndex = BoardUtil.MAX_ROWS - 1; rowIndex >= 0; --rowIndex) {
+            for (int colIndex = 0; colIndex < BoardUtil.MAX_COLS; ++colIndex) {
+                board[rowIndex][colIndex] = null;
+            }
+        }
+    }
 
 	private void initialize() {
         board = new Checker[BoardUtil.MAX_ROWS][BoardUtil.MAX_COLS];
@@ -43,24 +53,82 @@ public class Board {
     }
 
 	public static boolean isMoveLegal(Board board, List<Move> moves) throws Exception {
-    	boolean isValid = false;
+    	if (!validateMovesAreConnected(moves)) {
+    		return false;
+    	}
     	
-    	for (Move move : moves) {
-	    	isValid = move.isValid();
+		boolean isValid = false;
+    	Board workingBoard = new Board(board.getBoardState());
+    	
+    	for (int moveNum = 0; moveNum < moves.size(); ++moveNum) {
+    		Move move = moves.get(moveNum);
+	    	isValid = move.isValidMoveType();
 	    	
 	        if (isValid == false) {
 	        	return false;
 	        }
 	        
-	        move.commitMove();
-	        String updatedBoardState = board.getBoardState();
-	        board = new Board(updatedBoardState);
+	        Checker capturedPiece = workingBoard.commitMove(move);
+	        
+	        // King cannot move again unless it captures a piece.
+	        if (move.getMoveType() == MoveType.FLYING_KING) {
+	        	FlyingKing flyingKingMove = (FlyingKing) move;
+	        	
+	        	if (flyingKingMove.findObstructionsOnPath(workingBoard)) {
+	        		return false;
+	        	}
+	        	
+	        	if (capturedPiece == null && moveNum != moves.size() - 1) {
+	        		return false;
+	        	}
+	        } 
+	        
+	        if (moveMustCapturePiece(move) && capturedPiece == null) {
+		        return false;	
+	        }
+	        
+	        String updatedBoardState = workingBoard.getBoardState();
+	        workingBoard = new Board(updatedBoardState);
         }
         
         return isValid;
     }
 	
-    public boolean isOccupied(Coordinate square) {
+    public static boolean validateMovesAreConnected(List<Move> moves) {
+		Coordinate lastEnd = null;
+		
+		for (Move move : moves) {
+			if (lastEnd != null && !move.getStart().equals(lastEnd)) {
+				return false;
+			}
+			
+			lastEnd = move.getEnd();
+		}
+		
+		return true;
+	}
+
+	private static boolean moveMustCapturePiece(Move move) {
+    	return move.getMoveType() == MoveType.JUMP ||
+        		move.getMoveType() == MoveType.RAINBOW_JUMP ||
+        		move.getMoveType() == MoveType.CORNER_JUMP;
+	}
+
+	private Checker commitMove(Move move) {
+		Checker playerPiece = getPiece(move.getStart());
+		removePiece(move.getStart());
+		placePiece(playerPiece, move.getEnd());
+		Coordinate opponentLocation = move.getCapturedPieceLocation();	
+		Checker capturedPiece = getPiece(opponentLocation);
+		
+		if (opponentLocation != null) {
+			removePiece(opponentLocation);
+		}
+		
+		return capturedPiece;
+	}
+
+	public boolean isOccupied(Coordinate square) {
         return getPiece(square) != null;
     }
 
