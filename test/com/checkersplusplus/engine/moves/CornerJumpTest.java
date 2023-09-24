@@ -1,5 +1,6 @@
 package com.checkersplusplus.engine.moves;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -13,9 +14,29 @@ import com.checkersplusplus.engine.Board;
 import com.checkersplusplus.engine.Coordinate;
 import com.checkersplusplus.engine.enums.Color;
 import com.checkersplusplus.engine.pieces.Checker;
+import com.checkersplusplus.engine.pieces.King;
 
 public class CornerJumpTest {
 
+	@ParameterizedTest
+	@MethodSource("capturedPieceLocation")
+	public void testgetCapturedPieceLocation(int startCol, int startRow, int endCol, int endRow, int capturedPieceCol, int capturedPieceRow) {
+		Coordinate pieceStart = new Coordinate(startCol, startRow);
+		Coordinate pieceEnd = new Coordinate(endCol, endRow);
+		Coordinate capturedPieceLocation = new Coordinate(capturedPieceCol, capturedPieceRow);
+		CornerJump cornerJump = new CornerJump(pieceStart, pieceEnd);
+		assertEquals(cornerJump.getCapturedPieceLocation(), capturedPieceLocation);
+	}
+	
+	private static Stream<Arguments> capturedPieceLocation() {
+	    return Stream.of(
+	      Arguments.of(1, 0, 1, 2, 0, 1),
+	      Arguments.of(6, 0, 6, 2, 7, 1),
+	      Arguments.of(1, 7, 1, 5, 0, 6),
+	      Arguments.of(6, 7, 6, 5, 7, 6)
+	    );
+	}
+	
 	@ParameterizedTest
 	@MethodSource("validJumps")
 	public void testValidCornerJump(int startCol, int startRow, int endCol, int endRow, Color color) {

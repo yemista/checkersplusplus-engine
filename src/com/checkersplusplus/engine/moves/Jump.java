@@ -36,18 +36,18 @@ public class Jump extends Move {
 		// BLACK
 		if (end.getRow() > start.getRow()) {
 			if (end.getCol() > start.getCol()) {
-				opponentLocation = new Coordinate(start.getRow() + 1, start.getCol() + 1);
+				opponentLocation = new Coordinate(start.getCol() + 1, start.getRow() + 1);
 			} else {
-				opponentLocation = new Coordinate(start.getRow() + 1, start.getCol() - 1);
+				opponentLocation = new Coordinate(start.getCol() - 1, start.getRow() + 1);
 			}
 		}
 		
 		// RED
 		if (end.getRow() < start.getRow()) {
 			if (end.getCol() > start.getCol()) {
-				opponentLocation = new Coordinate(start.getRow() - 1, start.getCol() + 1);
+				opponentLocation = new Coordinate(start.getCol() + 1, start.getRow() - 1);
 			} else {
-				opponentLocation = new Coordinate(start.getRow() - 1, start.getCol() - 1);
+				opponentLocation = new Coordinate(start.getCol() - 1, start.getRow() - 1);
 			}
 		}
 		

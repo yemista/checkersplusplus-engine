@@ -63,11 +63,11 @@ public class FlyingKing extends Move {
 			rowDirection = -1;
 		}
 		
-		Coordinate squareBeforeEnd = new Coordinate(end.getCol() + (colDirection * -1), end.getRow() * (rowDirection * -1));
+		Coordinate squareBeforeEnd = new Coordinate(end.getCol() + (colDirection * -1), end.getRow() + (rowDirection * -1));
 		
 		for (Coordinate checkLocation = new Coordinate(start.getCol() + colDirection, start.getRow() + rowDirection); 
 				!checkLocation.equals(squareBeforeEnd);
-				checkLocation = new Coordinate(start.getCol() + colDirection, start.getRow() + rowDirection)) {
+				checkLocation = new Coordinate(checkLocation.getCol() + colDirection, checkLocation.getRow() + rowDirection)) {
 			if (board.getPiece(checkLocation) != null) {
 				return true;
 			}

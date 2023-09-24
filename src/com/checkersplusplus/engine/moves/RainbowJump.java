@@ -23,9 +23,9 @@ public class RainbowJump extends Move {
 		Coordinate opponentLocation = null;
 		
 		if (end.getRow() > start.getRow()) {
-			opponentLocation = new Coordinate(start.getRow() + 2, start.getCol());
+			opponentLocation = new Coordinate(start.getCol(), start.getRow() + 2);
 		} else {
-			opponentLocation = new Coordinate(start.getRow() - 2, start.getCol());
+			opponentLocation = new Coordinate(start.getCol(), start.getRow() - 2);
 		}
 		
 		return opponentLocation;
@@ -35,9 +35,9 @@ public class RainbowJump extends Move {
 		Coordinate opponentLocation = null;
 		
 		if (end.getCol() > start.getCol()) {
-			opponentLocation = new Coordinate(start.getRow(), start.getCol() + 2);
+			opponentLocation = new Coordinate(start.getCol() + 2, start.getRow());
 		} else {
-			opponentLocation = new Coordinate(start.getRow(), start.getCol() - 2);
+			opponentLocation = new Coordinate(start.getCol() - 2, start.getRow());
 		}
 		
 		return opponentLocation;

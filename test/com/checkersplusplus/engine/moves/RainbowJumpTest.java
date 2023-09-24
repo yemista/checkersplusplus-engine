@@ -1,5 +1,6 @@
 package com.checkersplusplus.engine.moves;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -15,6 +16,25 @@ import com.checkersplusplus.engine.enums.Color;
 import com.checkersplusplus.engine.pieces.Checker;
 
 public class RainbowJumpTest {
+	
+	@ParameterizedTest
+	@MethodSource("capturedPieceLocation")
+	public void testgetCapturedPieceLocation(int startCol, int startRow, int endCol, int endRow, int capturedPieceCol, int capturedPieceRow) {
+		Coordinate pieceStart = new Coordinate(startCol, startRow);
+		Coordinate pieceEnd = new Coordinate(endCol, endRow);
+		Coordinate capturedPieceLocation = new Coordinate(capturedPieceCol, capturedPieceRow);
+		RainbowJump rainbowJump = new RainbowJump(pieceStart, pieceEnd);
+		assertEquals(rainbowJump.getCapturedPieceLocation(), capturedPieceLocation);
+	}
+	
+	private static Stream<Arguments> capturedPieceLocation() {
+	    return Stream.of(
+	      Arguments.of(1, 1, 1, 5, 1, 3),
+	      Arguments.of(1, 3, 5, 3, 3, 3),
+	      Arguments.of(5, 3, 1, 3, 3, 3),
+	      Arguments.of(7, 7, 7, 3, 7, 5)
+	    );
+	}
 	
 	@ParameterizedTest
 	@MethodSource("validJumps")

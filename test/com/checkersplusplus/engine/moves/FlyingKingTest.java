@@ -1,5 +1,6 @@
 package com.checkersplusplus.engine.moves;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -17,7 +18,60 @@ import com.checkersplusplus.engine.pieces.Checker;
 import com.checkersplusplus.engine.pieces.King;
 
 public class FlyingKingTest {
-	//Test methods getCapturedPieceLocation and findObstructionsOnPath
+	
+	@ParameterizedTest
+	@MethodSource("capturedPieceLocation")
+	public void testgetCapturedPieceLocation(int startCol, int startRow, int endCol, int endRow, int capturedPieceCol, int capturedPieceRow) {
+		Coordinate pieceStart = new Coordinate(startCol, startRow);
+		Coordinate pieceEnd = new Coordinate(endCol, endRow);
+		Coordinate capturedPieceLocation = new Coordinate(capturedPieceCol, capturedPieceRow);
+		FlyingKing flyingKing = new FlyingKing(pieceStart, pieceEnd);
+		assertEquals(flyingKing.getCapturedPieceLocation(), capturedPieceLocation);
+	}
+	
+	private static Stream<Arguments> capturedPieceLocation() {
+	    return Stream.of(
+	      Arguments.of(0, 0, 7, 7, 6, 6),
+	      Arguments.of(0, 0, 6, 6, 5, 5),
+	      Arguments.of(7, 7, 0, 0, 1, 1),
+	      Arguments.of(6, 6, 0, 0, 1, 1),
+	      Arguments.of(0, 7, 7, 0, 6, 1),
+	      Arguments.of(0, 7, 6, 1, 5, 2),
+	      Arguments.of(7, 0, 0, 7, 1, 6),
+	      Arguments.of(7, 0, 1, 6, 2, 5)
+	    );
+	}
+	
+	@ParameterizedTest
+	@MethodSource("pathObstructions")
+	public void testFindObstructionsOnPath(int startCol, int startRow, int endCol, int endRow, int obstructionCol, int obstructionRow, boolean obstructionExists) {
+		Coordinate pieceStart = new Coordinate(startCol, startRow);
+		Coordinate pieceEnd = new Coordinate(endCol, endRow);
+		Coordinate opponentStart = new Coordinate(obstructionCol, obstructionRow);
+		FlyingKing flyingKing = new FlyingKing(pieceStart, pieceEnd);
+		Board board = new Board();
+		board.clear();
+		board.placePiece(new King(Color.BLACK), pieceStart);
+		board.placePiece(new Checker(Color.RED), opponentStart);
+		assertEquals(flyingKing.findObstructionsOnPath(board), obstructionExists);
+	}
+	
+	private static Stream<Arguments> pathObstructions() {
+	    return Stream.of(
+	      Arguments.of(0, 0, 7, 7, 6, 6, false),
+	      Arguments.of(0, 0, 7, 7, 5, 5, true),
+	      Arguments.of(0, 0, 7, 7, 5, 4, false),
+	      Arguments.of(7, 7, 0, 0, 1, 1, false),
+	      Arguments.of(7, 7, 0, 0, 5, 5, true),
+	      Arguments.of(7, 7, 0, 0, 5, 4, false),
+	      Arguments.of(0, 7, 7, 0, 6, 1, false),
+	      Arguments.of(0, 7, 7, 0, 5, 2, true),
+	      Arguments.of(0, 7, 7, 0, 5, 5, false),
+	      Arguments.of(7, 0, 0, 7, 1, 6, false),
+	      Arguments.of(7, 0, 0, 7, 2, 5, true),
+	      Arguments.of(7, 0, 0, 7, 5, 5, false)
+	    );
+	}
 	
 	@Test
 	public void checkerCannotActAsFlyingKing() {

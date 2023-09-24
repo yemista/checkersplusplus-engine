@@ -40,7 +40,7 @@ public class CornerJump extends Move {
 			}
 			
 			if (start.getCol() == 1) {
-				return new Coordinate(1, start.getRow() + 1);
+				return new Coordinate(0, start.getRow() + 1);
 			}
 		}
 		
@@ -50,7 +50,7 @@ public class CornerJump extends Move {
 			}
 			
 			if (start.getCol() == 1) {
-				return new Coordinate(1, start.getRow() - 1);
+				return new Coordinate(0, start.getRow() - 1);
 			}
 		}
 		

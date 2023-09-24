@@ -58,14 +58,11 @@ public class Board {
     		return false;
     	}
     	
-		boolean isValid = false;
     	Board workingBoard = new Board(board.getBoardState());
     	List<Checker> capturedPieces = new ArrayList<>();
     	
     	for (Move move : moves) {
-    		isValid = move.isValidMoveType();
-	    	
-	        if (isValid == false) {
+    		if (!move.isValidMoveType()) {
 	        	return false;
 	        }
 	        
@@ -102,8 +99,12 @@ public class Board {
 	        String updatedBoardState = workingBoard.getBoardState();
 	        workingBoard = new Board(updatedBoardState);
         }
+    	
+    	if (capturedPieces.size() > 0 && capturedPieces.size() != moves.size()) {
+    		return false;
+    	}
         
-        return isValid;
+        return true;
     }
 	
 	/**

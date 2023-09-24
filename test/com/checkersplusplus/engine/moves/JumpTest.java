@@ -1,5 +1,6 @@
 package com.checkersplusplus.engine.moves;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -14,6 +15,25 @@ import com.checkersplusplus.engine.Coordinate;
 
 public class JumpTest {
 
+	@ParameterizedTest
+	@MethodSource("capturedPieceLocation")
+	public void testgetCapturedPieceLocation(int startCol, int startRow, int endCol, int endRow, int capturedPieceCol, int capturedPieceRow) {
+		Coordinate pieceStart = new Coordinate(startCol, startRow);
+		Coordinate pieceEnd = new Coordinate(endCol, endRow);
+		Coordinate capturedPieceLocation = new Coordinate(capturedPieceCol, capturedPieceRow);
+		Jump jump = new Jump(pieceStart, pieceEnd);
+		assertEquals(jump.getCapturedPieceLocation(), capturedPieceLocation);
+	}
+	
+	private static Stream<Arguments> capturedPieceLocation() {
+	    return Stream.of(
+	      Arguments.of(1, 1, 3, 3, 2, 2),
+	      Arguments.of(3, 3, 1, 5, 2, 4),
+	      Arguments.of(7, 7, 5, 5, 6, 6),
+	      Arguments.of(5, 5, 7, 3, 6, 4)
+	    );
+	}
+	
 	@ParameterizedTest
 	@MethodSource("validJumps")
 	public void testValidJump(int startCol, int startRow, int endCol, int endRow) {
