@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Arrays;
 import java.util.stream.Stream;
 
 import org.junit.Test;
@@ -80,7 +81,8 @@ public class FlyingKingTest {
 		board.clear();
 		board.placePiece(new Checker(Color.BLACK), start);
 		Coordinate end = new Coordinate(7, 7);
-		assertFalse(FlyingKing.isValidFlyingKing(board, start, end));
+		FlyingKing move = new FlyingKing(start, end);
+		assertFalse(Board.isMoveLegal(board, Arrays.asList(move)));
 	}
 
 	@ParameterizedTest
@@ -91,7 +93,7 @@ public class FlyingKingTest {
 		board.clear();
 		board.placePiece(new King(Color.BLACK), start);
 		Coordinate end = new Coordinate(endCol, endRow);
-		assertTrue(FlyingKing.isValidFlyingKing(board, start, end));
+		assertTrue(FlyingKing.isValidFlyingKing(start, end));
 	}
 	
 	private static Stream<Arguments> validJumps() {
@@ -118,7 +120,7 @@ public class FlyingKingTest {
 		board.clear();
 		board.placePiece(new King(Color.BLACK), start);
 		Coordinate end = new Coordinate(endCol, endRow);
-		assertFalse(FlyingKing.isValidFlyingKing(board, start, end));
+		assertFalse(FlyingKing.isValidFlyingKing(start, end));
 	}
 	
 	private static Stream<Arguments> invalidJumps() {

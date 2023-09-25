@@ -24,7 +24,7 @@ public abstract class Move {
 
     @Override
     public String toString() {
-        return String.format("Start: %d,%d End: %d,%d", start.getRow(), start.getCol(), end.getRow(), end.getCol());
+        return String.format("Type: %s Start: %d,%d End: %d,%d", type.toString(), start.getCol(), start.getRow(), end.getCol(), end.getRow());
     }
 
 	public Coordinate getStart() {

@@ -12,11 +12,7 @@ public class CornerJump extends Move {
 		// TODO Auto-generated constructor stub
 	}
 
-	public static boolean isValidCornerJump(Board board, Coordinate start, Coordinate end) {
-		if (!MoveUtil.commonValidation(board, start, end)) {
-			return false;
-		}
-		
+	public static boolean isValidCornerJump(Coordinate start, Coordinate end) {
 		if (start.getCol() != end.getCol()) {
 			return false;
 		}

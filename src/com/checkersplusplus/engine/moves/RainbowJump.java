@@ -11,11 +11,7 @@ public class RainbowJump extends Move {
 		super(MoveType.RAINBOW_JUMP, start, end);
 	}
 
-	public static boolean isValidRainbowJump(Board board, Coordinate start, Coordinate end) {
-		if (!MoveUtil.commonValidation(board, start, end)) {
-			return false;
-		}
-		
+	public static boolean isValidRainbowJump(Coordinate start, Coordinate end) {
 		return isValidHorizontalJump(start, end) || isValidVerticalJump(start, end);
 	}
 	

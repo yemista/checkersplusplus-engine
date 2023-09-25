@@ -27,7 +27,7 @@ public class ForwardMoveTest {
 		Checker playerPiece = board.getPiece(start);
 		assertNotNull(playerPiece);
 		assertEquals(playerPiece.getColor(), color);
-		assertTrue(ForwardMove.isValidForwardMove(board, start, end));
+		assertTrue(ForwardMove.isValidForwardMove(start, end));
 	}
 	
 	private static Stream<Arguments> validForwardMoves() {
@@ -48,19 +48,15 @@ public class ForwardMoveTest {
 		Checker playerPiece = board.getPiece(start);
 		assertNotNull(playerPiece);
 		assertEquals(playerPiece.getColor(), color);
-		assertFalse(ForwardMove.isValidForwardMove(board, start, end));
+		assertFalse(ForwardMove.isValidForwardMove(start, end));
 	}
 	
 	private static Stream<Arguments> invalidForwardMoves() {
 	    return Stream.of(
-	      Arguments.of(1, 1, 0, 2, Color.BLACK),
-	      Arguments.of(1, 1, 2, 2, Color.BLACK),
 	      Arguments.of(1, 1, 3, 3, Color.BLACK),
 	      Arguments.of(1, 1, 1, 2, Color.BLACK),
-	      Arguments.of(2, 6, 1, 5, Color.RED),
-	      Arguments.of(2, 6, 3, 5, Color.RED),
-	      Arguments.of(2, 6, 4, 4, Color.RED),
-	      Arguments.of(2, 6, 2, 5, Color.RED)
+	      Arguments.of(2, 6, 2, 5, Color.RED),
+	      Arguments.of(2, 6, 5, 5, Color.RED)
 	    );
 	}
 }

@@ -1,13 +1,15 @@
 package com.checkersplusplus.engine.enums;
 
 public enum Color {
-	RED('O'),
-    BLACK('X');
+	RED('O', 'o'),
+    BLACK('X', 'x');
 	
 	private char symbol;
+	private char kingSymbol;
 	
-	Color(char symbol) {
+	Color(char symbol, char kingSymbol) {
 		this.symbol = symbol;
+		this.kingSymbol = kingSymbol;
 	}
 
 	public char getSymbol() {
@@ -23,6 +25,18 @@ public enum Color {
 			return Color.BLACK;
 		}
 		
+		if (symbol == 'o') {
+			return Color.RED;
+		}
+		
+		if (symbol == 'x') {
+			return Color.BLACK;
+		}
+		
 		return null;
+	}
+
+	public char getKingSymbol() {
+		return kingSymbol;
 	}
 }

@@ -45,7 +45,7 @@ public class CornerJumpTest {
 		board.clear();
 		board.placePiece(new Checker(color), start);
 		Coordinate end = new Coordinate(endCol, endRow);
-		assertTrue(CornerJump.isValidCornerJump(board, start, end));
+		assertTrue(CornerJump.isValidCornerJump(start, end));
 	}
 	
 	private static Stream<Arguments> validJumps() {
@@ -65,7 +65,7 @@ public class CornerJumpTest {
 		board.clear();
 		board.placePiece(new Checker(color), start);
 		Coordinate end = new Coordinate(endCol, endRow);
-		assertFalse(CornerJump.isValidCornerJump(board, start, end));
+		assertFalse(CornerJump.isValidCornerJump(start, end));
 	}
 	
 	private static Stream<Arguments> invalidJumps() {

@@ -44,7 +44,7 @@ public class RainbowJumpTest {
 		board.clear();
 		board.placePiece(new Checker(color), start);
 		Coordinate end = new Coordinate(endCol, endRow);
-		assertTrue(RainbowJump.isValidRainbowJump(board, start, end));
+		assertTrue(RainbowJump.isValidRainbowJump(start, end));
 	}
 	
 	private static Stream<Arguments> validJumps() {
@@ -66,7 +66,7 @@ public class RainbowJumpTest {
 		board.clear();
 		board.placePiece(new Checker(color), start);
 		Coordinate end = new Coordinate(endCol, endRow);
-		assertFalse(RainbowJump.isValidRainbowJump(board, start, end));
+		assertFalse(RainbowJump.isValidRainbowJump(start, end));
 	}
 	
 	private static Stream<Arguments> invalidJumps() {

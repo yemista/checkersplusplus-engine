@@ -40,7 +40,7 @@ public class JumpTest {
 		Board board = new Board();
 		Coordinate start = new Coordinate(startCol, startRow);
 		Coordinate end = new Coordinate(endCol, endRow);
-		assertTrue(Jump.isValidJump(board, start, end));
+		assertTrue(Jump.isValidJump(start, end));
 	}
 	
 	private static Stream<Arguments> validJumps() {
@@ -58,14 +58,13 @@ public class JumpTest {
 		Board board = new Board();
 		Coordinate start = new Coordinate(startCol, startRow);
 		Coordinate end = new Coordinate(endCol, endRow);
-		assertFalse(Jump.isValidJump(board, start, end));
+		assertFalse(Jump.isValidJump(start, end));
 	}
 	
 	private static Stream<Arguments> invalidJumps() {
 	    return Stream.of(
 	      Arguments.of(2, 2, 3, 3),
 	      Arguments.of(2, 2, 1, 3),
-	      Arguments.of(3, 3, 1, 1),
 	      Arguments.of(3, 3, 1, 4)
 	    );
 	}

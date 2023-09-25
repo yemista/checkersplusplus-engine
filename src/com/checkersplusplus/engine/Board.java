@@ -10,6 +10,7 @@ import com.checkersplusplus.engine.moves.Move;
 import com.checkersplusplus.engine.pieces.Checker;
 import com.checkersplusplus.engine.pieces.King;
 import com.checkersplusplus.engine.util.BoardUtil;
+import com.checkersplusplus.engine.util.MoveUtil;
 
 public class Board {
 	private Checker[][] board;
@@ -25,7 +26,14 @@ public class Board {
     	
     	for (int rowIndex = BoardUtil.MAX_ROWS - 1; rowIndex >= 0; --rowIndex) {
             for (int colIndex = 0; colIndex < BoardUtil.MAX_COLS; ++colIndex) {
-                board[rowIndex][colIndex] = boardState[boardStateIndex] == 'E' ? null : new Checker(Color.fromSymbol(boardState[boardStateIndex]));
+                if (boardState[boardStateIndex] == 'E') {
+                	board[rowIndex][colIndex] = null;
+                } else if (Character.isLowerCase(boardState[boardStateIndex])) {
+                	board[rowIndex][colIndex] = new King(Color.fromSymbol(boardState[boardStateIndex]));
+                } else {
+                	board[rowIndex][colIndex] = new Checker(Color.fromSymbol(boardState[boardStateIndex]));
+                }
+                
                 boardStateIndex++;
             }
         }
@@ -52,8 +60,14 @@ public class Board {
         BoardUtil.fillRow(board, 6, Color.RED);
         BoardUtil.fillRow(board, 5, Color.RED);
     }
+	
+	public void commitMoves(List<Move> moves) {
+		for (Move move : moves) {
+			commitMove(move);
+		}
+	}
 
-	public static boolean isMoveLegal(Board board, List<Move> moves) throws Exception {
+	public static boolean isMoveLegal(Board board, List<Move> moves) {
     	if (!validateMovesAreConnected(moves)) {
     		return false;
     	}
@@ -65,8 +79,12 @@ public class Board {
     		if (!move.isValidMoveType()) {
 	        	return false;
 	        }
+    		
+    		if (!MoveUtil.commonValidation(workingBoard, move)) {
+    			return false;
+    		}
 	        
-	        if (moveInWrongDirection(workingBoard, move)) {
+	        if (isMoveInWrongDirection(workingBoard, move)) {
 	        	return false;
 	        }
 	        
@@ -111,7 +129,7 @@ public class Board {
 	 * Check if piece moves in correct direction based on color. Black pieces move up while red move down.
 	 * If the piece is a King, it can go in any direction.
 	 */
-    public static boolean moveInWrongDirection(Board board, Move move) {
+    public static boolean isMoveInWrongDirection(Board board, Move move) {
 		Checker piece = board.getPiece(move.getStart());
     	
 		if (piece instanceof King) {
@@ -124,11 +142,11 @@ public class Board {
 		}
 		
 		if (piece.getColor() == Color.BLACK) {
-			return move.getEnd().getRow() > move.getStart().getRow();
+			return move.getEnd().getRow() <= move.getStart().getRow();
 		}
 		
 		if (piece.getColor() == Color.RED) {
-			return move.getEnd().getRow() < move.getStart().getRow();
+			return move.getEnd().getRow() >= move.getStart().getRow();
 		}
 		
     	return true;
@@ -157,11 +175,20 @@ public class Board {
 	private Checker commitMove(Move move) {
 		Checker playerPiece = getPiece(move.getStart());
 		removePiece(move.getStart());
-		placePiece(playerPiece, move.getEnd());
+		
+		if (playerPiece.getColor() == Color.BLACK && move.getEnd().getRow() == 7) {
+			placePiece(new King(Color.BLACK), move.getEnd());
+		} else if (playerPiece.getColor() == Color.RED && move.getEnd().getRow() == 0) {
+			placePiece(new King(Color.RED), move.getEnd());
+		} else {
+			placePiece(playerPiece, move.getEnd());
+		}
+		
 		Coordinate opponentLocation = move.getCapturedPieceLocation();	
-		Checker capturedPiece = getPiece(opponentLocation);
+		Checker capturedPiece = null;
 		
 		if (opponentLocation != null) {
+			capturedPiece = getPiece(opponentLocation);
 			removePiece(opponentLocation);
 		}
 		
@@ -198,7 +225,11 @@ public class Board {
                 char cellChar = 'E';
 
                 if (board[rowIndex][colIndex] != null) {
-                    cellChar = board[rowIndex][colIndex].getColor() == Color.BLACK ? Color.BLACK.getSymbol() : Color.RED.getSymbol();
+                	if (board[rowIndex][colIndex] instanceof King) {
+                		cellChar = board[rowIndex][colIndex].getColor() == Color.BLACK ? Color.BLACK.getKingSymbol() : Color.RED.getKingSymbol();
+                	} else {
+                		cellChar = board[rowIndex][colIndex].getColor() == Color.BLACK ? Color.BLACK.getSymbol() : Color.RED.getSymbol();
+                	}
                 }
 
                 stringBuilder.append(cellChar);

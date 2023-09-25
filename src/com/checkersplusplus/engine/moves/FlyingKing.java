@@ -13,17 +13,7 @@ public class FlyingKing extends Move {
 		super(MoveType.FLYING_KING, start, end);
 	}
 
-	public static boolean isValidFlyingKing(Board board, Coordinate start, Coordinate end) {
-		if (!MoveUtil.commonValidation(board, start, end)) {
-			return false;
-		}
-		
-		Checker playerPiece = board.getPiece(start);
-		
-		if (!(playerPiece instanceof King)) {
-			return false;	
-		}
-		
+	public static boolean isValidFlyingKing( Coordinate start, Coordinate end) {
 		return Math.abs(start.getCol() - end.getCol()) == Math.abs(start.getRow() - end.getRow());
 	}
 	
