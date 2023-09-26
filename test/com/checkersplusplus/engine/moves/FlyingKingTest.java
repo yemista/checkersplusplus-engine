@@ -14,6 +14,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import com.checkersplusplus.engine.Board;
 import com.checkersplusplus.engine.Coordinate;
+import com.checkersplusplus.engine.CoordinatePair;
 import com.checkersplusplus.engine.enums.Color;
 import com.checkersplusplus.engine.pieces.Checker;
 import com.checkersplusplus.engine.pieces.King;
@@ -81,8 +82,8 @@ public class FlyingKingTest {
 		board.clear();
 		board.placePiece(new Checker(Color.BLACK), start);
 		Coordinate end = new Coordinate(7, 7);
-		FlyingKing move = new FlyingKing(start, end);
-		assertFalse(Board.isMoveLegal(board, Arrays.asList(move)));
+		CoordinatePair pair = new CoordinatePair(start, end);
+		assertFalse(Board.isMoveLegal(board, Arrays.asList(pair)));
 	}
 
 	@ParameterizedTest
@@ -93,7 +94,7 @@ public class FlyingKingTest {
 		board.clear();
 		board.placePiece(new King(Color.BLACK), start);
 		Coordinate end = new Coordinate(endCol, endRow);
-		assertTrue(FlyingKing.isValidFlyingKing(start, end));
+		assertTrue(FlyingKing.isValidFlyingKing(board, start, end));
 	}
 	
 	private static Stream<Arguments> validJumps() {
@@ -120,7 +121,7 @@ public class FlyingKingTest {
 		board.clear();
 		board.placePiece(new King(Color.BLACK), start);
 		Coordinate end = new Coordinate(endCol, endRow);
-		assertFalse(FlyingKing.isValidFlyingKing(start, end));
+		assertFalse(FlyingKing.isValidFlyingKing(board, start, end));
 	}
 	
 	private static Stream<Arguments> invalidJumps() {

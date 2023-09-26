@@ -1,7 +1,10 @@
 package com.checkersplusplus.engine.moves;
 
+import com.checkersplusplus.engine.Board;
 import com.checkersplusplus.engine.Coordinate;
 import com.checkersplusplus.engine.enums.MoveType;
+import com.checkersplusplus.engine.pieces.Checker;
+import com.checkersplusplus.engine.pieces.King;
 
 public class Jump extends Move {
 
@@ -9,7 +12,13 @@ public class Jump extends Move {
 		super(MoveType.JUMP, start, end);
 	}
 
-	public static boolean isValidJump(Coordinate start, Coordinate end) {
+	public static boolean isValidJump(Board board, Coordinate start, Coordinate end) {
+		Checker playerPiece = board.getPiece(start);
+
+		if (playerPiece instanceof King) {
+			return false;	
+		}
+		
 		// Valid jump should progress 2 rows.
 		if (Math.abs(end.getRow() - start.getRow()) != 2) {
 			return false;
@@ -23,8 +32,7 @@ public class Jump extends Move {
 		return true;
 	}
 	
-	@Override
-	public Coordinate getCapturedPieceLocation() {
+	private static Coordinate getCapturedPieceLocation(Coordinate start, Coordinate end) {
 		Coordinate opponentLocation = null;
 		
 		// BLACK
@@ -46,6 +54,11 @@ public class Jump extends Move {
 		}
 		
 		return opponentLocation;
+	}
+	
+	@Override
+	public Coordinate getCapturedPieceLocation() {
+		return Jump.getCapturedPieceLocation(start, end);
 	}
 
 	@Override

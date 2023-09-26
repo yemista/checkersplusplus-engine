@@ -25,14 +25,14 @@ public class BoardTest {
 	
 	@ParameterizedTest
 	@MethodSource("connectedMoves")
-	public void testValidateMovesAreConnected(List<Move> moves, boolean connected) {
+	public void testValidateMovesAreConnected(List<CoordinatePair> moves, boolean connected) {
 		assertEquals(Board.validateMovesAreConnected(moves), connected);
 	}
 	
 	private static Stream<Arguments> connectedMoves() {
 	    return Stream.of(
-	      Arguments.of(Arrays.asList(new Jump(new Coordinate(0, 0), new Coordinate(2, 2)), new Jump(new Coordinate(2, 2), new Coordinate(4, 4))), true),
-	      Arguments.of(Arrays.asList(new Jump(new Coordinate(0, 0), new Coordinate(2, 2)), new Jump(new Coordinate(1, 2), new Coordinate(4, 4))), false)
+	      Arguments.of(Arrays.asList(new CoordinatePair(new Coordinate(0, 0), new Coordinate(2, 2)), new CoordinatePair(new Coordinate(2, 2), new Coordinate(4, 4))), true),
+	      Arguments.of(Arrays.asList(new CoordinatePair(new Coordinate(0, 0), new Coordinate(2, 2)), new CoordinatePair(new Coordinate(1, 2), new Coordinate(4, 4))), false)
 	    );
 	}
 	

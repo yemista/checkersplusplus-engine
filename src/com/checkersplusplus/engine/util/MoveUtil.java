@@ -47,7 +47,7 @@ public class MoveUtil {
 			return MoveType.FORWARD_MOVE;
 		}
     	
-    	if (Jump.isValidJump(start, end)) {
+    	if (Jump.isValidJump(board, start, end)) {
 			return MoveType.JUMP;
 		}
 		
@@ -59,7 +59,7 @@ public class MoveUtil {
 			return MoveType.CORNER_JUMP;
 		}
 		
-		if (FlyingKing.isValidFlyingKing(start, end)) {
+		if (FlyingKing.isValidFlyingKing(board, start, end)) {
 			return MoveType.FLYING_KING;
 		}
 		

@@ -40,7 +40,7 @@ public class JumpTest {
 		Board board = new Board();
 		Coordinate start = new Coordinate(startCol, startRow);
 		Coordinate end = new Coordinate(endCol, endRow);
-		assertTrue(Jump.isValidJump(start, end));
+		assertTrue(Jump.isValidJump(board, start, end));
 	}
 	
 	private static Stream<Arguments> validJumps() {
@@ -58,7 +58,7 @@ public class JumpTest {
 		Board board = new Board();
 		Coordinate start = new Coordinate(startCol, startRow);
 		Coordinate end = new Coordinate(endCol, endRow);
-		assertFalse(Jump.isValidJump(start, end));
+		assertFalse(Jump.isValidJump(board, start, end));
 	}
 	
 	private static Stream<Arguments> invalidJumps() {

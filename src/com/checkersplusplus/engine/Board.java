@@ -67,15 +67,36 @@ public class Board {
 		}
 	}
 
-	public static boolean isMoveLegal(Board board, List<Move> moves) {
-    	if (!validateMovesAreConnected(moves)) {
+	public static boolean isMoveLegal(Board board, List<CoordinatePair> moveCoordinates) {
+    	if (!validateMovesAreConnected(moveCoordinates)) {
     		return false;
     	}
     	
     	Board workingBoard = new Board(board.getBoardState());
     	List<Checker> capturedPieces = new ArrayList<>();
     	
-    	for (Move move : moves) {
+    	// Special case for flying king. If there is only one move that move can be a flying king
+    	// and it does not have to capture a piece. Otherwise if it is a chain of jumps with a flying
+    	// king, it must capture a piece to continue the chain.
+    	if (moveCoordinates.size() == 1) {
+    		CoordinatePair moveCoordinate = moveCoordinates.get(0);
+    		Move move = MoveUtil.createMove(workingBoard, moveCoordinate.getStart(), moveCoordinate.getEnd());
+    		
+    		if (move.getMoveType() == MoveType.FLYING_KING) {
+    			FlyingKing flyingKing = (FlyingKing) move;
+    			return !flyingKing.findObstructionsOnPath(workingBoard);
+    		} else if (move.getMoveType() == MoveType.FORWARD_MOVE) {
+    			return true;
+    		}
+    	}
+    	
+    	for (CoordinatePair moveCoordinate : moveCoordinates) {
+    		Move move = MoveUtil.createMove(workingBoard, moveCoordinate.getStart(), moveCoordinate.getEnd());
+    		
+    		if (move.getMoveType() == MoveType.FORWARD_MOVE) {
+    			return false;
+    		}
+    		
     		if (!move.isValidMoveType()) {
 	        	return false;
 	        }
@@ -118,7 +139,7 @@ public class Board {
 	        workingBoard = new Board(updatedBoardState);
         }
     	
-    	if (capturedPieces.size() > 0 && capturedPieces.size() != moves.size()) {
+    	if (capturedPieces.size() > 0 && capturedPieces.size() != moveCoordinates.size()) {
     		return false;
     	}
         
@@ -152,10 +173,10 @@ public class Board {
     	return true;
 	}
 
-	public static boolean validateMovesAreConnected(List<Move> moves) {
+	public static boolean validateMovesAreConnected(List<CoordinatePair> moves) {
 		Coordinate lastEnd = null;
 		
-		for (Move move : moves) {
+		for (CoordinatePair move : moves) {
 			if (lastEnd != null && !move.getStart().equals(lastEnd)) {
 				return false;
 			}
