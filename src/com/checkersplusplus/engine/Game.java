@@ -1,6 +1,9 @@
 package com.checkersplusplus.engine;
 
+import java.util.List;
+
 import com.checkersplusplus.engine.enums.Color;
+import com.checkersplusplus.engine.pieces.Checker;
 import com.checkersplusplus.engine.util.BoardUtil;
 
 public class Game {
@@ -31,6 +34,21 @@ public class Game {
     	}
     	
     	board = new Board(parts[1]);
+    }
+    
+    public boolean isMoveLegal(List<CoordinatePair> coordinates) {
+    	if (coordinates == null || coordinates.isEmpty()) {
+    		return false;
+    	}
+    	
+    	Coordinate startSquare = coordinates.get(0).getStart();
+    	Checker piece = board.getPiece(startSquare);
+    	
+    	if (piece.getColor() != currentMove) {
+    		return false;
+    	}
+    	
+    	return board.isMoveLegal(board, coordinates);
     }
     
     public String getGameState() {

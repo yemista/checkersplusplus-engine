@@ -21,6 +21,10 @@ public class Board {
 
     public Board(String state) {
     	board = new Checker[BoardUtil.MAX_ROWS][BoardUtil.MAX_COLS];
+    	updateBoardState(state);
+	}
+    
+    private void updateBoardState(String state) {
     	char[] boardState = state.toCharArray();
     	int boardStateIndex = 0;
     	
@@ -38,8 +42,8 @@ public class Board {
             }
         }
 	}
-    
-    /**
+
+	/**
      * Clears all pieces off the board. Should only be used for testing.
      */
     public void clear() {
@@ -60,12 +64,6 @@ public class Board {
         BoardUtil.fillRow(board, 6, Color.RED);
         BoardUtil.fillRow(board, 5, Color.RED);
     }
-	
-	public void commitMoves(List<Move> moves) {
-		for (Move move : moves) {
-			commitMove(move);
-		}
-	}
 
 	public static boolean isMoveLegal(Board board, List<CoordinatePair> moveCoordinates) {
     	if (!validateMovesAreConnected(moveCoordinates)) {
@@ -191,6 +189,15 @@ public class Board {
     	return move.getMoveType() == MoveType.JUMP ||
         		move.getMoveType() == MoveType.RAINBOW_JUMP ||
         		move.getMoveType() == MoveType.CORNER_JUMP;
+	}
+	
+	public void commitMoves(List<CoordinatePair> coordinates) {
+		for (CoordinatePair coordinatePair : coordinates) {
+			Board workingBoard = new Board(getBoardState());
+			Move move = MoveUtil.createMove(workingBoard, coordinatePair.getStart(), coordinatePair.getEnd());
+			workingBoard.commitMove(move);
+			updateBoardState(workingBoard.getBoardState());
+		}
 	}
 
 	private Checker commitMove(Move move) {
