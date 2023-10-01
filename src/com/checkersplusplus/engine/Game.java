@@ -25,9 +25,7 @@ public class Game {
     	
     	char[] nextMove = parts[0].toCharArray();
     	
-    	if (nextMove[0] == 'W') {
-    		winner = Color.fromSymbol(nextMove[1]);
-    	} else if (nextMove[0] == 'N') {
+    	if (nextMove[0] == 'N') {
     		currentMove = Color.fromSymbol(nextMove[1]);
     	} else {
     		throw new IllegalArgumentException("Cannot instantiate game from invalid state");
@@ -48,14 +46,15 @@ public class Game {
     		return false;
     	}
     	
-    	return board.isMoveLegal(board, coordinates);
+    	return Board.isMoveLegal(board, coordinates);
+    }
+    
+    public void doMove(List<CoordinatePair> coordinates) {
+    	board.commitMoves(coordinates);
+    	currentMove = currentMove == Color.BLACK ? Color.RED : Color.BLACK;
     }
     
     public String getGameState() {
-    	if (winner != null) {
-    		return String.format("%c%c|%s", 'W', winner.getSymbol(), board.getBoardState());
-    	}
-    	
     	return String.format("%c%c|%s", 'N', currentMove.getSymbol(), board.getBoardState());
     }
 
@@ -80,4 +79,8 @@ public class Game {
 
         return !opponentFound;
     }
+
+	public Board getBoard() {
+		return board;
+	}
 }
