@@ -79,13 +79,16 @@ public class Board {
     	if (moveCoordinates.size() == 1) {
     		CoordinatePair moveCoordinate = moveCoordinates.get(0);
     		Move move = MoveUtil.createMove(workingBoard, moveCoordinate.getStart(), moveCoordinate.getEnd());
-    		
-    		if (move.getMoveType() == MoveType.FLYING_KING) {
-    			FlyingKing flyingKing = (FlyingKing) move;
-    			return !flyingKing.findObstructionsOnPath(workingBoard);
-    		} else if (move.getMoveType() == MoveType.FORWARD_MOVE) {
-    			return true;
-    		}
+
+			if (!validateMove(move, workingBoard)) {
+				return false;
+			}
+			
+			if (moveMustCapturePiece(move) && workingBoard.commitMove(move) == null) {
+		        return false;	
+	        }
+			
+			return true;
     	}
     	
     	for (CoordinatePair moveCoordinate : moveCoordinates) {
@@ -95,43 +98,27 @@ public class Board {
     			return false;
     		}
     		
-    		if (!move.isValidMoveType()) {
-	        	return false;
-	        }
-    		
-    		if (!MoveUtil.commonValidation(workingBoard, move)) {
+    		if (!validateMove(move, workingBoard)) {
     			return false;
     		}
-	        
-	        if (isMoveInWrongDirection(workingBoard, move)) {
-	        	return false;
-	        }
-	        
-	        if (move.getMoveType() == MoveType.FLYING_KING) {
-	        	FlyingKing flyingKing = (FlyingKing) move;
-	        	
-	        	if (flyingKing.findObstructionsOnPath(workingBoard)) {
-	        		return false;
-	        	}
-	        }
-	        
-	        Checker capturedPiece = workingBoard.commitMove(move);
-	        
-	        if (capturedPiece != null) {
-	        	capturedPieces.add(capturedPiece);
-	        }
-	        
-	        if (capturedPiece == null) {
-	        	// King cannot fly again unless it captures a piece.
-	        	if (move.getMoveType() == MoveType.FLYING_KING) {
-	        		return false;
-	        	}
-	        	
-	        	// Jump, rainbow jump, and corner jump must capture a piece
-	        	if (moveMustCapturePiece(move)) {
-			        return false;	
-		        }
-	        } 
+    		
+    		Checker capturedPiece = workingBoard.commitMove(move);
+            
+            if (capturedPiece != null) {
+            	capturedPieces.add(capturedPiece);
+            }
+            
+            if (capturedPiece == null) {
+            	// King cannot fly again unless it captures a piece.
+            	if (move.getMoveType() == MoveType.FLYING_KING) {
+            		return false;
+            	}
+            	
+            	// Jump, rainbow jump, and corner jump must capture a piece
+            	if (moveMustCapturePiece(move)) {
+    		        return false;	
+    	        }
+            }
 	        
 	        String updatedBoardState = workingBoard.getBoardState();
 	        workingBoard = new Board(updatedBoardState);
@@ -144,6 +131,30 @@ public class Board {
         return true;
     }
 	
+	private static boolean validateMove(Move move, Board workingBoard) {
+		if (!move.isValidMoveType()) {
+        	return false;
+        }
+		
+		if (!MoveUtil.commonValidation(workingBoard, move)) {
+			return false;
+		}
+        
+        if (isMoveInWrongDirection(workingBoard, move)) {
+        	return false;
+        }
+        
+        if (move.getMoveType() == MoveType.FLYING_KING) {
+        	FlyingKing flyingKing = (FlyingKing) move;
+        	
+        	if (flyingKing.findObstructionsOnPath(workingBoard)) {
+        		return false;
+        	}
+        }
+        
+        return true;
+	}
+
 	/**
 	 * Check if piece moves in correct direction based on color. Black pieces move up while red move down.
 	 * If the piece is a King, it can go in any direction.

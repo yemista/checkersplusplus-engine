@@ -5,7 +5,6 @@ import com.checkersplusplus.engine.Coordinate;
 import com.checkersplusplus.engine.enums.MoveType;
 import com.checkersplusplus.engine.pieces.Checker;
 import com.checkersplusplus.engine.pieces.King;
-import com.checkersplusplus.engine.util.MoveUtil;
 
 public class FlyingKing extends Move {
 

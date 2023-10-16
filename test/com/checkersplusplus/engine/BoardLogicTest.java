@@ -1,6 +1,5 @@
 package com.checkersplusplus.engine;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -10,11 +9,8 @@ import java.util.List;
 import org.junit.Test;
 
 import com.checkersplusplus.engine.enums.Color;
-import com.checkersplusplus.engine.enums.MoveType;
-import com.checkersplusplus.engine.moves.Move;
 import com.checkersplusplus.engine.pieces.Checker;
 import com.checkersplusplus.engine.pieces.King;
-import com.checkersplusplus.engine.util.MoveUtil;
 
 /**
  * Purpose of this class is to test complicated move scenarios for the method isMoveLegal()

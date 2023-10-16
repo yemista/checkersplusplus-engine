@@ -1,11 +1,7 @@
 package com.checkersplusplus.engine.moves;
 
-import com.checkersplusplus.engine.Board;
 import com.checkersplusplus.engine.Coordinate;
-import com.checkersplusplus.engine.enums.Color;
 import com.checkersplusplus.engine.enums.MoveType;
-import com.checkersplusplus.engine.pieces.Checker;
-import com.checkersplusplus.engine.util.MoveUtil;
 
 public class ForwardMove extends Move {
 
@@ -15,7 +11,7 @@ public class ForwardMove extends Move {
 
 	@Override
 	public Coordinate getCapturedPieceLocation() {
-		// Forward move can never capture a piece.
+		// Forward move can never capture a piece. 
 		return null;
 	}
 

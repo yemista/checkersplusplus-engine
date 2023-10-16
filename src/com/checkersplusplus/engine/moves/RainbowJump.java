@@ -1,9 +1,7 @@
 package com.checkersplusplus.engine.moves;
 
-import com.checkersplusplus.engine.Board;
 import com.checkersplusplus.engine.Coordinate;
 import com.checkersplusplus.engine.enums.MoveType;
-import com.checkersplusplus.engine.util.MoveUtil;
 
 public class RainbowJump extends Move {
 

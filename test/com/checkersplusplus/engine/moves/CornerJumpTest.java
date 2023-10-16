@@ -14,7 +14,6 @@ import com.checkersplusplus.engine.Board;
 import com.checkersplusplus.engine.Coordinate;
 import com.checkersplusplus.engine.enums.Color;
 import com.checkersplusplus.engine.pieces.Checker;
-import com.checkersplusplus.engine.pieces.King;
 
 public class CornerJumpTest {
 

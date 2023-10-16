@@ -7,13 +7,12 @@ import com.checkersplusplus.engine.pieces.Checker;
 import com.checkersplusplus.engine.util.BoardUtil;
 
 public class Game {
-	private Color currentMove;
+	private int currentMove;
     private Board board;
-    private Color winner;
     
     public Game() {
     	board = new Board();
-    	currentMove = Color.BLACK;
+    	currentMove = 0;
     }
     
     public Game(String state) {
@@ -23,15 +22,15 @@ public class Game {
     		throw new IllegalArgumentException("Cannot instantiate game from invalid state");
     	}
     	
-    	char[] nextMove = parts[0].toCharArray();
+    	char[] nextMove = parts[1].toCharArray();
     	
-    	if (nextMove[0] == 'N') {
-    		currentMove = Color.fromSymbol(nextMove[1]);
-    	} else {
+    	try {
+    		currentMove = Integer.parseInt(new String(nextMove));
+    	} catch (Exception e) {
     		throw new IllegalArgumentException("Cannot instantiate game from invalid state");
     	}
     	
-    	board = new Board(parts[1]);
+    	board = new Board(parts[0]);
     }
     
     public boolean isMoveLegal(List<CoordinatePair> coordinates) {
@@ -42,7 +41,7 @@ public class Game {
     	Coordinate startSquare = coordinates.get(0).getStart();
     	Checker piece = board.getPiece(startSquare);
     	
-    	if (piece.getColor() != currentMove) {
+    	if (piece.getColor() != getCurrentMoveColor()) {
     		return false;
     	}
     	
@@ -51,11 +50,11 @@ public class Game {
     
     public void doMove(List<CoordinatePair> coordinates) {
     	board.commitMoves(coordinates);
-    	currentMove = currentMove == Color.BLACK ? Color.RED : Color.BLACK;
+    	currentMove++;
     }
     
     public String getGameState() {
-    	return String.format("%c%c|%s", 'N', currentMove.getSymbol(), board.getBoardState());
+    	return String.format("%s|%d", board.getBoardState(), currentMove);
     }
 
     public boolean isWinner(Color team) {
@@ -82,5 +81,13 @@ public class Game {
 
 	public Board getBoard() {
 		return board;
+	}
+	
+	public Color getCurrentMoveColor() {
+		return (currentMove + 1) % 2 == 1 ? Color.BLACK : Color.RED;
+	}
+	
+	public int getCurrentMove() {
+		return currentMove;
 	}
 }
