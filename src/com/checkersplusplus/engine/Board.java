@@ -64,6 +64,27 @@ public class Board {
         BoardUtil.fillRow(board, 6, Color.RED);
         BoardUtil.fillRow(board, 5, Color.RED);
     }
+	
+	public static boolean isMoveLegal(Board board, Move move) {
+		Board workingBoard = new Board(board.getBoardState());
+		
+		if (!validateMove(move, workingBoard)) {
+			return false;
+		}
+		
+		Checker ownPiece = workingBoard.getPiece(move.getStart());
+		Checker capturedPiece = workingBoard.commitMove(move);
+		
+		if (moveMustCapturePiece(move) && capturedPiece == null) {
+	        return false;	
+        }
+		
+		if (ownPiece.getColor() == capturedPiece.getColor()) {
+    		return false;
+    	}
+		
+		return true;
+	}
 
 	public static boolean isMoveLegal(Board board, List<CoordinatePair> moveCoordinates) {
     	if (!validateMovesAreConnected(moveCoordinates)) {
@@ -79,16 +100,7 @@ public class Board {
     	if (moveCoordinates.size() == 1) {
     		CoordinatePair moveCoordinate = moveCoordinates.get(0);
     		Move move = MoveUtil.createMove(workingBoard, moveCoordinate.getStart(), moveCoordinate.getEnd());
-
-			if (!validateMove(move, workingBoard)) {
-				return false;
-			}
-			
-			if (moveMustCapturePiece(move) && workingBoard.commitMove(move) == null) {
-		        return false;	
-	        }
-			
-			return true;
+    		return isMoveLegal(workingBoard, move);
     	}
     	
     	for (CoordinatePair moveCoordinate : moveCoordinates) {
@@ -102,9 +114,14 @@ public class Board {
     			return false;
     		}
     		
+    		Checker ownPiece = workingBoard.getPiece(moveCoordinate.getStart());
     		Checker capturedPiece = workingBoard.commitMove(move);
             
             if (capturedPiece != null) {
+            	if (ownPiece.getColor() == capturedPiece.getColor()) {
+            		return false;
+            	}
+            	
             	capturedPieces.add(capturedPiece);
             }
             
@@ -211,7 +228,7 @@ public class Board {
 		}
 	}
 
-	private Checker commitMove(Move move) {
+	public Checker commitMove(Move move) {
 		Checker playerPiece = getPiece(move.getStart());
 		removePiece(move.getStart());
 		
