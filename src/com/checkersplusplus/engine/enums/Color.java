@@ -7,7 +7,7 @@ public enum Color {
 	private char symbol;
 	private char kingSymbol;
 	
-	Color(char symbol, char kingSymbol) {
+	Color(char kingSymbol, char symbol) {
 		this.symbol = symbol;
 		this.kingSymbol = kingSymbol;
 	}

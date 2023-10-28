@@ -32,7 +32,7 @@ public class Board {
             for (int colIndex = 0; colIndex < BoardUtil.MAX_COLS; ++colIndex) {
                 if (boardState[boardStateIndex] == 'E') {
                 	board[rowIndex][colIndex] = null;
-                } else if (Character.isLowerCase(boardState[boardStateIndex])) {
+                } else if (Character.isUpperCase(boardState[boardStateIndex])) {
                 	board[rowIndex][colIndex] = new King(Color.fromSymbol(boardState[boardStateIndex]));
                 } else {
                 	board[rowIndex][colIndex] = new Checker(Color.fromSymbol(boardState[boardStateIndex]));
@@ -79,7 +79,7 @@ public class Board {
 	        return false;	
         }
 		
-		if (ownPiece.getColor() == capturedPiece.getColor()) {
+		if (capturedPiece != null && ownPiece.getColor() == capturedPiece.getColor()) {
     		return false;
     	}
 		
@@ -243,7 +243,7 @@ public class Board {
 		Coordinate opponentLocation = move.getCapturedPieceLocation();	
 		Checker capturedPiece = null;
 		
-		if (opponentLocation != null) {
+		if (opponentLocation != null && getPiece(opponentLocation) != null) {
 			capturedPiece = getPiece(opponentLocation);
 			removePiece(opponentLocation);
 		}
@@ -282,9 +282,9 @@ public class Board {
 
                 if (board[rowIndex][colIndex] != null) {
                 	if (board[rowIndex][colIndex] instanceof King) {
-                		cellChar = board[rowIndex][colIndex].getColor() == Color.BLACK ? Color.BLACK.getKingSymbol() : Color.RED.getKingSymbol();
+                		cellChar = board[rowIndex][colIndex].getColor().getKingSymbol();
                 	} else {
-                		cellChar = board[rowIndex][colIndex].getColor() == Color.BLACK ? Color.BLACK.getSymbol() : Color.RED.getSymbol();
+                		cellChar = board[rowIndex][colIndex].getColor().getSymbol();
                 	}
                 }
 
@@ -308,7 +308,11 @@ public class Board {
                 char cellChar = ' ';
 
                 if (board[rowIndex][colIndex] != null) {
-                    cellChar = board[rowIndex][colIndex].getColor() == Color.BLACK ? 'X' : 'O';
+                	if (board[rowIndex][colIndex] instanceof King) {
+                		cellChar = board[rowIndex][colIndex].getColor().getKingSymbol();
+                	} else {
+                		cellChar = board[rowIndex][colIndex].getColor().getSymbol();
+                	}
                 }
 
                 stringBuilder.append(String.format(cellFormat, cellChar));

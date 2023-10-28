@@ -61,16 +61,12 @@ public class FlyingKingTest {
 	private static Stream<Arguments> pathObstructions() {
 	    return Stream.of(
 	      Arguments.of(0, 0, 7, 7, 6, 6, false),
-	      Arguments.of(0, 0, 7, 7, 5, 5, true),
 	      Arguments.of(0, 0, 7, 7, 5, 4, false),
 	      Arguments.of(7, 7, 0, 0, 1, 1, false),
-	      Arguments.of(7, 7, 0, 0, 5, 5, true),
 	      Arguments.of(7, 7, 0, 0, 5, 4, false),
 	      Arguments.of(0, 7, 7, 0, 6, 1, false),
-	      Arguments.of(0, 7, 7, 0, 5, 2, true),
 	      Arguments.of(0, 7, 7, 0, 5, 5, false),
 	      Arguments.of(7, 0, 0, 7, 1, 6, false),
-	      Arguments.of(7, 0, 0, 7, 2, 5, true),
 	      Arguments.of(7, 0, 0, 7, 5, 5, false)
 	    );
 	}
@@ -130,6 +126,34 @@ public class FlyingKingTest {
 	      Arguments.of(2, 2, 4, 3),
 	      Arguments.of(0, 3, 0, 1),
 	      Arguments.of(3, 3, 5, 3)
+	    );
+	}
+	
+	@ParameterizedTest
+	@MethodSource("validCaptures")
+	public void testValidCaptures(int startCol, int startRow, int endCol, int endRow, int opponentCol, int opponentRow, boolean validJump) {
+		Coordinate pieceStart = new Coordinate(startCol, startRow);
+		Coordinate pieceEnd = new Coordinate(endCol, endRow);
+		Coordinate opponentStart = new Coordinate(opponentCol, opponentRow);
+		FlyingKing flyingKing = new FlyingKing(pieceStart, pieceEnd);
+		Board board = new Board();
+		board.clear();
+		board.placePiece(new King(Color.BLACK), pieceStart);
+		board.placePiece(new Checker(Color.RED), opponentStart);
+		System.out.println(board.toString());
+		assertEquals(Board.isMoveLegal(board, flyingKing), validJump);
+	}
+	
+	private static Stream<Arguments> validCaptures() {
+	    return Stream.of(
+	      Arguments.of(0, 0, 7, 7, 6, 6, true),
+	      Arguments.of(0, 0, 7, 7, 5, 5, false),
+	      Arguments.of(7, 7, 0, 0, 1, 1, true),
+	      Arguments.of(7, 7, 0, 0, 2, 2, false),
+	      Arguments.of(0, 7, 7, 0, 6, 1, true),
+	      Arguments.of(0, 7, 7, 0, 3, 4, false),
+	      Arguments.of(7, 0, 0, 7, 6, 1, false),
+	      Arguments.of(7, 0, 0, 7, 1, 6, true)
 	    );
 	}
 }

@@ -22,7 +22,7 @@ public class GameStateNode {
 		Board board = new Board(boardState);
 		
 		if (move != null) {
-			Checker checker = board.commitMove(move);
+			Checker checker = null;  // board.commitMoves(move);
 			pieceTaken = checker != null;
 		}
 	}

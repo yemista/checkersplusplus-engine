@@ -15,6 +15,7 @@ public class Jump extends Move {
 	public static boolean isValidJump(Board board, Coordinate start, Coordinate end) {
 		Checker playerPiece = board.getPiece(start);
 
+		// TODO remove this if and add unit test
 		if (playerPiece instanceof King) {
 			return false;	
 		}

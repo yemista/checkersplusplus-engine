@@ -1,7 +1,5 @@
 package com.checkersplusplus.engine;
 
-import java.util.Objects;
-
 public class Coordinate {
 	private int col, row;
 
@@ -20,7 +18,10 @@ public class Coordinate {
     
     @Override
     public int hashCode() {
-    	return Objects.hashCode(this);
+    	int hash = 7;
+        hash = 31 * hash + col;
+        hash = 31 * hash + row;
+        return hash;
     }
     
     @Override
@@ -31,5 +32,10 @@ public class Coordinate {
     	}
     	
     	return false;
+    }
+    
+    @Override
+    public String toString() {
+    	return String.format("col: %d row: %d", col, row);
     }
 }

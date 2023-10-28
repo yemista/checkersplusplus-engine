@@ -58,14 +58,25 @@ public class FlyingKing extends Move {
 			rowDirection = -1;
 		}
 		
-		Coordinate squareBeforeEnd = new Coordinate(end.getCol() + (colDirection * -1), end.getRow() + (rowDirection * -1));
+		int obstructionCount = 0;
+		Coordinate lastObstruction = null;
 		
 		for (Coordinate checkLocation = new Coordinate(start.getCol() + colDirection, start.getRow() + rowDirection); 
-				!checkLocation.equals(squareBeforeEnd);
+				!checkLocation.equals(end);
 				checkLocation = new Coordinate(checkLocation.getCol() + colDirection, checkLocation.getRow() + rowDirection)) {
 			if (board.getPiece(checkLocation) != null) {
-				return true;
+				lastObstruction = checkLocation;
+				obstructionCount++;
 			}
+		}
+		
+		if (obstructionCount > 1) {
+			return true;
+		}
+		
+		// If there is only one obstruction and that obstruction is not the piece we are capturing then it is invalid.
+		if (obstructionCount == 1 && !lastObstruction.equals(getCapturedPieceLocation())) {
+			return true;
 		}
 		
 		return false;

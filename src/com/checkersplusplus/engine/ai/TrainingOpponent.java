@@ -6,6 +6,7 @@ import java.util.List;
 import com.checkersplusplus.engine.Board;
 import com.checkersplusplus.engine.Coordinate;
 import com.checkersplusplus.engine.enums.Color;
+import com.checkersplusplus.engine.enums.MoveType;
 import com.checkersplusplus.engine.moves.Move;
 import com.checkersplusplus.engine.pieces.Checker;
 import com.checkersplusplus.engine.pieces.King;
@@ -14,69 +15,82 @@ import com.checkersplusplus.engine.util.MoveUtil;
 
 public class TrainingOpponent {
 
-//	public static List<Move> getOpponentMove(String boardState, Color color) {
-//		Board board = new Board(boardState);
-//		List<Move> allPossibleMoves = new ArrayList<>();
-//		
-//		for (int col = 0; col < BoardUtil.MAX_COLS; ++col) {
-//			for (int row = 0; row < BoardUtil.MAX_ROWS; ++row) {
-//				Coordinate pieceLocation = new Coordinate(col, row);
-//				Checker piece = board.getPiece(pieceLocation);
-//				
-//				if (piece != null && piece.getColor() == color) {
-//					List<Move> moves = generatePossibleMoves(pieceLocation, boardState);
-//					allPossibleMoves.addAll(moves);
-//				}
-//			}
-//		}
-//		
-//		return Collections.emptyList();
-//	}
-//	
-//	public static List<GameStateNode> constructMoveTree(String boardState, Color color, int depth) {
-//		List<GameStateNode> rootNodes = generateLevel(boardState, color);
-//		List<GameStateNode> queue = new ArrayList<>();
-//		queue.addAll(rootNodes);
-//		
-//		for (int level = 1; level < depth; ++level) {
-//			List<GameStateNode> newChildren = new ArrayList<>();
-//			
-//			while (!queue.isEmpty()) {
-//				GameStateNode node = queue.remove(0);
-//				List<GameStateNode> children = generateLevel(node.getBoardState(), getOtherColor(node.getColor()));
-//				node.getChildren().addAll(children);
-//				newChildren.addAll(children);
-//			}
-//		}
-//				
-//		return rootNodes;
-//	}
+	public static List<Move> getBestMove(String boardState, Color color) {
+		Board board = new Board(boardState);
+		List<MoveChain> allPossibleMoves = new ArrayList<>();
+		
+		for (int col = 0; col < BoardUtil.MAX_COLS; ++col) {
+			for (int row = 0; row < BoardUtil.MAX_ROWS; ++row) {
+				Coordinate pieceLocation = new Coordinate(col, row);
+				Checker piece = board.getPiece(pieceLocation);
+				
+				if (piece != null && piece.getColor() == color) {
+					List<MoveChain> moves = generatePossibleMoves(pieceLocation, boardState);
+					allPossibleMoves.addAll(moves);
+				}
+			}
+		}
+		
+		List<List<Move>> specificMoves = new ArrayList<>();
+		
+		for (MoveChain moveChain : allPossibleMoves) {
+			specificMoves.addAll(createSpecificMovesFromMoveChain(moveChain));
+		}
+		
+		List<Move> bestMove = null;
+		
+		for (List<Move> move : specificMoves) {
+			if (bestMove == null) {
+				bestMove = move;
+			}
+			
+			if (getMoveScore(move, boardState) > getMoveScore(bestMove, boardState)) {
+				bestMove = move;
+			}
+		}
+		
+		return bestMove;
+	}
 	
-//	private static List<GameStateNode> generateLevel(String boardState, Color color) {
-//		List<GameStateNode> levelOfNodes = new ArrayList<>();
-//		
-//		for (int col = 0; col < BoardUtil.MAX_COLS; ++col) {
-//			for (int row = 0; row < BoardUtil.MAX_ROWS; ++row) {
-//				Board board = new Board(boardState);
-//				Coordinate pieceLocation = new Coordinate(col, row);
-//				Checker piece = board.getPiece(pieceLocation);
-//				
-//				if (piece != null && piece.getColor() == color) {
-//					List<AiMove> moves = generatePossibleMoves(pieceLocation, boardState);
-//					
-//					for (AiMove move : moves) {
-//						Board boardWithMove = new Board(boardState);
-//						boardWithMove.commitMove(move);
-//						GameStateNode node = new GameStateNode(boardWithMove.getBoardState(), move, color);
-//						levelOfNodes.add(node);
-//					}
-//				}
-//			}
-//		}
-//		
-//		return levelOfNodes;
-//	}
-	
+	private static int getMoveScore(List<Move> bestMove, String boardState) {
+		Board board = new Board(boardState);
+		int score = 0;
+		
+		for (Move move : bestMove) {
+			score++;
+			Checker capture = board.commitMove(move);
+			
+			if (capture != null) {
+				score++;
+			}
+		}
+		
+		return score;
+	}
+
+	protected static List<List<Move>> createSpecificMovesFromMoveChain(MoveChain moveChain) {
+		List<List<Move>> retVal = new ArrayList<>();
+		List<Move> work = new ArrayList<>();
+		work.add(moveChain.getMove());
+		createSpecificMovesFromMoveChainInner(moveChain, work, retVal);
+		return retVal;
+	}
+
+	private static void createSpecificMovesFromMoveChainInner(MoveChain current, List<Move> work, List<List<Move>> retVal) {
+		if (current.getNextMove().isEmpty()) {
+			List<Move> moveList = new ArrayList<>();
+			moveList.addAll(work);
+			retVal.add(moveList);
+			work.remove(work.size() - 1);
+			return;
+		}
+		
+		for (MoveChain child : current.getNextMove()) {
+			 work.add(child.getMove());
+			createSpecificMovesFromMoveChainInner(child, work, retVal);
+		}
+	}
+
 	private static Color getOtherColor(Color color) {
 		return color == Color.RED ? Color.BLACK : Color.RED;
 	}
@@ -133,32 +147,28 @@ public class TrainingOpponent {
 			return moves;
 		}
 		
-		for (int col = pieceLocation.getCol(); col < BoardUtil.MAX_COLS; ++col) {
-			for (int row = pieceLocation.getRow(); row < BoardUtil.MAX_ROWS; ++row) {
-				Coordinate endLocation = new Coordinate(col, row);
-				addFlyingKingMoveIfValid(moves, board, pieceLocation, endLocation, mustCapture);
-			}
+		for (int col = pieceLocation.getCol(), row = pieceLocation.getRow(); 
+				col < BoardUtil.MAX_COLS && row < BoardUtil.MAX_ROWS; ++col, ++row) {
+			Coordinate endLocation = new Coordinate(col, row);
+			addFlyingKingMoveIfValid(moves, board, pieceLocation, endLocation, mustCapture);
 		}
 		
-		for (int col = pieceLocation.getCol(); col >= 0; --col) {
-			for (int row = pieceLocation.getRow(); row >= 0; --row) {
-				Coordinate endLocation = new Coordinate(col, row);
-				addFlyingKingMoveIfValid(moves, board, pieceLocation, endLocation, mustCapture);
-			}
+		for (int col = pieceLocation.getCol(), row = pieceLocation.getRow(); 
+				col >= 0 && row >= 0; --col, --row) {
+			Coordinate endLocation = new Coordinate(col, row);
+			addFlyingKingMoveIfValid(moves, board, pieceLocation, endLocation, mustCapture);
 		}
 		
-		for (int col = pieceLocation.getCol(); col >= 0; --col) {
-			for (int row = pieceLocation.getRow(); row < BoardUtil.MAX_ROWS; ++row) {
-				Coordinate endLocation = new Coordinate(col, row);
-				addFlyingKingMoveIfValid(moves, board, pieceLocation, endLocation, mustCapture);
-			}
+		for (int col = pieceLocation.getCol(), row = pieceLocation.getRow(); 
+				col >= 0 && row < BoardUtil.MAX_ROWS; --col, ++row) {
+			Coordinate endLocation = new Coordinate(col, row);
+			addFlyingKingMoveIfValid(moves, board, pieceLocation, endLocation, mustCapture);
 		}
 		
-		for (int col = pieceLocation.getCol(); col < BoardUtil.MAX_COLS; ++col) {
-			for (int row = pieceLocation.getRow(); row >= 0; --row) {
-				Coordinate endLocation = new Coordinate(col, row);
-				addFlyingKingMoveIfValid(moves, board, pieceLocation, endLocation, mustCapture);
-			}
+		for (int col = pieceLocation.getCol(), row = pieceLocation.getRow(); 
+				col < BoardUtil.MAX_COLS && row >= 0; ++col, --row) {
+			Coordinate endLocation = new Coordinate(col, row);
+			addFlyingKingMoveIfValid(moves, board, pieceLocation, endLocation, mustCapture);
 		}
 		
 		return moves;
@@ -172,11 +182,18 @@ public class TrainingOpponent {
 		Move move = MoveUtil.createMove(board, pieceLocation, endLocation);
 		Coordinate capturedPieceLocation = move.getCapturedPieceLocation();
 		
-		if (mustCapture && board.getPiece(capturedPieceLocation) == null) {
+		if (Board.isMoveLegal(board, move)) {
 			return;
 		}
 		
-		if (Board.isMoveLegal(board, move)) {
+		if (move.getMoveType() == MoveType.FORWARD_MOVE) {
+			moves.add(new MoveChain(move, board.getBoardState()));
+			return;
+		}
+		
+		if (mustCapture && capturedPieceLocation != null && board.getPiece(capturedPieceLocation) != null) {
+			moves.add(new MoveChain(move, board.getBoardState()));
+		} else {
 			moves.add(new MoveChain(move, board.getBoardState()));
 		}
 	}
@@ -231,13 +248,13 @@ public class TrainingOpponent {
 		}
 		
 		if (checker.getColor() == Color.RED) {
-			Move moveLeft = MoveUtil.createMove(board, pieceLocation, new Coordinate(pieceLocation.getCol() - 2, pieceLocation.getRow() - 2));
+			Move moveLeft = MoveUtil.createMove(board, pieceLocation, new Coordinate(pieceLocation.getCol() - 4, pieceLocation.getRow()));
 			
 			if (Board.isMoveLegal(board, moveLeft)) {
 				jumps.add(new MoveChain(moveLeft, boardState));
 			}
 			
-			Move moveRight = MoveUtil.createMove(board, pieceLocation, new Coordinate(pieceLocation.getCol() + 2, pieceLocation.getRow() - 2));
+			Move moveRight = MoveUtil.createMove(board, pieceLocation, new Coordinate(pieceLocation.getCol() + 4, pieceLocation.getRow()));
 			
 			if (Board.isMoveLegal(board, moveRight)) {
 				jumps.add(new MoveChain(moveRight, boardState));
