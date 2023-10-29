@@ -65,6 +65,40 @@ public class Board {
         BoardUtil.fillRow(board, 5, Color.RED);
     }
 	
+	/**
+	 *  Used by AI when validating move chains
+	 * @param board
+	 * @param move
+	 * @param mustCapture
+	 * @return
+	 */
+	public static boolean isMoveLegal(Board board, Move move, boolean mustCapture) {
+		Board workingBoard = new Board(board.getBoardState());
+		
+		if (!validateMove(move, workingBoard)) {
+			return false;
+		}
+		
+		Checker ownPiece = workingBoard.getPiece(move.getStart());
+		Checker capturedPiece = workingBoard.commitMove(move);
+		
+		if (mustCapture && capturedPiece == null) {
+	        return false;	
+        }
+		
+		if (capturedPiece != null && ownPiece.getColor() == capturedPiece.getColor()) {
+    		return false;
+    	}
+		
+		return true;
+	}
+	
+	/**
+	 * Used to validate a single move only. Logic fails with move chains.
+	 * @param board
+	 * @param move
+	 * @return
+	 */
 	public static boolean isMoveLegal(Board board, Move move) {
 		Board workingBoard = new Board(board.getBoardState());
 		

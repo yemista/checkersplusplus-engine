@@ -21,6 +21,19 @@ import com.checkersplusplus.engine.pieces.King;
 
 public class FlyingKingTest {
 	
+	// TODO test
+	@Test
+	public void flyingKingCanCornerJumpBackwards() {
+		
+	}
+	
+	
+	// TODO test
+	@Test
+	public void flyingKingCanRainbowBackwards() {
+		
+	}
+	
 	@ParameterizedTest
 	@MethodSource("capturedPieceLocation")
 	public void testgetCapturedPieceLocation(int startCol, int startRow, int endCol, int endRow, int capturedPieceCol, int capturedPieceRow) {

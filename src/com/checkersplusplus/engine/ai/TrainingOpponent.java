@@ -55,13 +55,23 @@ public class TrainingOpponent {
 	private static int getMoveScore(List<Move> bestMove, String boardState) {
 		Board board = new Board(boardState);
 		int score = 0;
-		
+		boolean isKingInitially = board.getPiece(bestMove.get(0).getStart()) instanceof King;
+
 		for (Move move : bestMove) {
 			score++;
+			
 			Checker capture = board.commitMove(move);
 			
 			if (capture != null) {
 				score++;
+			}
+			
+			if (capture instanceof King) {
+				score += 2;
+			}
+			
+			if (!isKingInitially && board.getPiece(move.getEnd()) instanceof King) {
+				score += 5;
 			}
 		}
 		
@@ -86,13 +96,11 @@ public class TrainingOpponent {
 		}
 		
 		for (MoveChain child : current.getNextMove()) {
-			 work.add(child.getMove());
-			createSpecificMovesFromMoveChainInner(child, work, retVal);
+			List<Move> currentWork = new ArrayList<>();
+			currentWork.addAll(work);
+			currentWork.add(child.getMove());
+			createSpecificMovesFromMoveChainInner(child, currentWork, retVal);
 		}
-	}
-
-	private static Color getOtherColor(Color color) {
-		return color == Color.RED ? Color.BLACK : Color.RED;
 	}
 	
 	private static List<MoveChain> generateInitialMoves(Coordinate pieceLocation, String boardState) {
@@ -182,20 +190,25 @@ public class TrainingOpponent {
 		Move move = MoveUtil.createMove(board, pieceLocation, endLocation);
 		Coordinate capturedPieceLocation = move.getCapturedPieceLocation();
 		
-		if (Board.isMoveLegal(board, move)) {
+		if (!Board.isMoveLegal(board, move, mustCapture)) {
 			return;
 		}
 		
-		if (move.getMoveType() == MoveType.FORWARD_MOVE) {
+		if (!mustCapture && move.getMoveType() == MoveType.FORWARD_MOVE) {
 			moves.add(new MoveChain(move, board.getBoardState()));
 			return;
 		}
 		
-		if (mustCapture && capturedPieceLocation != null && board.getPiece(capturedPieceLocation) != null) {
-			moves.add(new MoveChain(move, board.getBoardState()));
-		} else {
-			moves.add(new MoveChain(move, board.getBoardState()));
-		}
+		if (mustCapture) { 
+			if(capturedPieceLocation != null && board.getPiece(capturedPieceLocation) != null
+					&& board.getPiece(capturedPieceLocation).getColor() != board.getPiece(pieceLocation).getColor()) {
+				moves.add(new MoveChain(move, board.getBoardState()));
+			}
+			
+			return;
+		} 
+		
+		moves.add(new MoveChain(move, board.getBoardState()));
 	}
 
 	private static List<MoveChain> generateCornerJumps(Coordinate pieceLocation, String boardState) {
@@ -203,18 +216,18 @@ public class TrainingOpponent {
 		Board board = new Board(boardState);
 		Checker checker = board.getPiece(pieceLocation);
 		
-		if (checker.getColor() == Color.BLACK) {
+		if (checker.getColor() == Color.BLACK || checker instanceof King) {
 			Move moveLeft = MoveUtil.createMove(board, pieceLocation, new Coordinate(pieceLocation.getCol(), pieceLocation.getRow() + 2));
 			
-			if (Board.isMoveLegal(board, moveLeft)) {
+			if (Board.isMoveLegal(board, moveLeft, true)) {
 				jumps.add(new MoveChain(moveLeft, boardState));
 			}
 		}
 		
-		if (checker.getColor() == Color.RED) {
+		if (checker.getColor() == Color.RED || checker instanceof King) {
 			Move moveLeft = MoveUtil.createMove(board, pieceLocation, new Coordinate(pieceLocation.getCol(), pieceLocation.getRow() - 2));
 			
-			if (Board.isMoveLegal(board, moveLeft)) {
+			if (Board.isMoveLegal(board, moveLeft, true)) {
 				jumps.add(new MoveChain(moveLeft, boardState));
 			}
 		}
@@ -230,19 +243,19 @@ public class TrainingOpponent {
 		if (checker.getColor() == Color.BLACK) {
 			Move moveLeft = MoveUtil.createMove(board, pieceLocation, new Coordinate(pieceLocation.getCol() - 4, pieceLocation.getRow()));
 			
-			if (Board.isMoveLegal(board, moveLeft)) {
+			if (Board.isMoveLegal(board, moveLeft, true)) {
 				jumps.add(new MoveChain(moveLeft, boardState));
 			}
 			
 			Move moveRight = MoveUtil.createMove(board, pieceLocation, new Coordinate(pieceLocation.getCol() + 4, pieceLocation.getRow()));
 			
-			if (Board.isMoveLegal(board, moveRight)) {
+			if (Board.isMoveLegal(board, moveRight, true)) {
 				jumps.add(new MoveChain(moveRight, boardState));
 			}
 			
 			Move moveUp = MoveUtil.createMove(board, pieceLocation, new Coordinate(pieceLocation.getCol(), pieceLocation.getRow() + 4));
 			
-			if (Board.isMoveLegal(board, moveUp)) {
+			if (Board.isMoveLegal(board, moveUp, true)) {
 				jumps.add(new MoveChain(moveUp, boardState));
 			}
 		}
@@ -250,19 +263,19 @@ public class TrainingOpponent {
 		if (checker.getColor() == Color.RED) {
 			Move moveLeft = MoveUtil.createMove(board, pieceLocation, new Coordinate(pieceLocation.getCol() - 4, pieceLocation.getRow()));
 			
-			if (Board.isMoveLegal(board, moveLeft)) {
+			if (Board.isMoveLegal(board, moveLeft, true)) {
 				jumps.add(new MoveChain(moveLeft, boardState));
 			}
 			
 			Move moveRight = MoveUtil.createMove(board, pieceLocation, new Coordinate(pieceLocation.getCol() + 4, pieceLocation.getRow()));
 			
-			if (Board.isMoveLegal(board, moveRight)) {
+			if (Board.isMoveLegal(board, moveRight, true)) {
 				jumps.add(new MoveChain(moveRight, boardState));
 			}
 			
 			Move moveUp = MoveUtil.createMove(board, pieceLocation, new Coordinate(pieceLocation.getCol(), pieceLocation.getRow() - 4));
 			
-			if (Board.isMoveLegal(board, moveUp)) {
+			if (Board.isMoveLegal(board, moveUp, true)) {
 				jumps.add(new MoveChain(moveUp, boardState));
 			}
 		}
@@ -278,13 +291,13 @@ public class TrainingOpponent {
 		if (checker.getColor() == Color.BLACK) {
 			Move moveLeft = MoveUtil.createMove(board, pieceLocation, new Coordinate(pieceLocation.getCol() - 2, pieceLocation.getRow() + 2));
 			
-			if (Board.isMoveLegal(board, moveLeft)) {
+			if (Board.isMoveLegal(board, moveLeft, true)) {
 				jumps.add(new MoveChain(moveLeft, boardState));
 			}
 			
 			Move moveRight = MoveUtil.createMove(board, pieceLocation, new Coordinate(pieceLocation.getCol() + 2, pieceLocation.getRow() + 2));
 			
-			if (Board.isMoveLegal(board, moveRight)) {
+			if (Board.isMoveLegal(board, moveRight, true)) {
 				jumps.add(new MoveChain(moveRight, boardState));
 			}
 		}
@@ -292,13 +305,13 @@ public class TrainingOpponent {
 		if (checker.getColor() == Color.RED) {
 			Move moveLeft = MoveUtil.createMove(board, pieceLocation, new Coordinate(pieceLocation.getCol() - 2, pieceLocation.getRow() - 2));
 			
-			if (Board.isMoveLegal(board, moveLeft)) {
+			if (Board.isMoveLegal(board, moveLeft, true)) {
 				jumps.add(new MoveChain(moveLeft, boardState));
 			}
 			
 			Move moveRight = MoveUtil.createMove(board, pieceLocation, new Coordinate(pieceLocation.getCol() + 2, pieceLocation.getRow() - 2));
 			
-			if (Board.isMoveLegal(board, moveRight)) {
+			if (Board.isMoveLegal(board, moveRight, true)) {
 				jumps.add(new MoveChain(moveRight, boardState));
 			}
 		}
