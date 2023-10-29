@@ -33,6 +33,7 @@ public class FlyingKingTest {
 	
 	private static Stream<Arguments> capturedPieceLocation() {
 	    return Stream.of(
+	      Arguments.of(0, 0, 2, 2, 1, 1),
 	      Arguments.of(0, 0, 7, 7, 6, 6),
 	      Arguments.of(0, 0, 6, 6, 5, 5),
 	      Arguments.of(7, 7, 0, 0, 1, 1),
@@ -140,7 +141,6 @@ public class FlyingKingTest {
 		board.clear();
 		board.placePiece(new King(Color.BLACK), pieceStart);
 		board.placePiece(new Checker(Color.RED), opponentStart);
-		System.out.println(board.toString());
 		assertEquals(Board.isMoveLegal(board, flyingKing), validJump);
 	}
 	

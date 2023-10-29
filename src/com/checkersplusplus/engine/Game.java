@@ -56,8 +56,44 @@ public class Game {
     public String getGameState() {
     	return String.format("%s|%d", board.getBoardState(), currentMove);
     }
+    
+    public boolean isDraw() {
+    	int numRed = 0;
+    	int numBlack = 0;
+    	
+    	for (int rowCounter = 0; rowCounter < BoardUtil.MAX_ROWS; ++rowCounter) {
+            for (int colCounter = 0; colCounter < BoardUtil.MAX_COLS; ++colCounter) {
+            	Coordinate location = new Coordinate(rowCounter, colCounter);
+            	Checker piece = board.getPiece(location);
+            	
+            	if (piece != null) {
+            		if (piece.getColor() == Color.BLACK) {
+            			numBlack++;
+            		}
+            		
+            		if (piece.getColor() == Color.RED) {
+            			numRed++;
+            		}
+            	}
+            }
+    	}
+    	
+    	return numRed == 1 && numBlack == 1;
+    }
 
-    public boolean isWinner(Color team) {
+    public Color getWinner() {
+    	if (isWinner(Color.BLACK)) {
+    		return Color.BLACK;
+    	}
+    	
+    	if (isWinner(Color.RED)) {
+    		return Color.RED;
+    	}
+    	
+    	return null;
+    }
+    
+    private boolean isWinner(Color team) {
         Color opponent = team == Color.BLACK ? Color.RED : Color.BLACK;
         boolean opponentFound = false;
 
