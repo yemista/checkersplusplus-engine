@@ -2,6 +2,7 @@ package com.checkersplusplus.engine.ai;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import com.checkersplusplus.engine.Board;
 import com.checkersplusplus.engine.Coordinate;
@@ -37,19 +38,29 @@ public class TrainingOpponent {
 			specificMoves.addAll(createSpecificMovesFromMoveChain(moveChain));
 		}
 		
-		List<Move> bestMove = null;
+		List<List<Move>> bestMoves = new ArrayList<>();
 		
 		for (List<Move> move : specificMoves) {
-			if (bestMove == null) {
-				bestMove = move;
+			if (bestMoves.isEmpty()) {
+				bestMoves.add(move);
 			}
 			
-			if (getMoveScore(move, boardState) > getMoveScore(bestMove, boardState)) {
-				bestMove = move;
+			int bestMoveScore = getMoveScore(bestMoves.get(0), boardState);
+			int moveScore = getMoveScore(move, boardState);
+			
+			if (moveScore == bestMoveScore) {
+				bestMoves.add(move);
+			}
+			
+			if (moveScore > bestMoveScore) {
+				bestMoves.clear();
+				bestMoves.add(move);
 			}
 		}
 		
-		return bestMove;
+		Random r = new Random();
+		int randomIndex = r.nextInt(bestMoves.size());
+		return bestMoves.get(randomIndex);
 	}
 	
 	private static int getMoveScore(List<Move> bestMove, String boardState) {
