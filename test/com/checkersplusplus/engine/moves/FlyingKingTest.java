@@ -18,20 +18,57 @@ import com.checkersplusplus.engine.CoordinatePair;
 import com.checkersplusplus.engine.enums.Color;
 import com.checkersplusplus.engine.pieces.Checker;
 import com.checkersplusplus.engine.pieces.King;
+import com.checkersplusplus.engine.util.MoveUtil;
 
 public class FlyingKingTest {
 	
-	// TODO test
-	@Test
-	public void flyingKingCanCornerJumpBackwards() {
+	@ParameterizedTest
+	@MethodSource("backwardsCornerJumpCapturedPieceLocation")
+	public void flyingKingCanCornerJumpBackwards(int startCol, int startRow, int endCol, int endRow, int capturedPieceCol, int capturedPieceRow, Color color) {
+		Coordinate pieceStart = new Coordinate(startCol, startRow);
+		Coordinate pieceEnd = new Coordinate(endCol, endRow);
+		Coordinate capturedPieceLocation = new Coordinate(capturedPieceCol, capturedPieceRow);
+		Board board = new Board();
+		board.clear();
+		board.placePiece(new Checker(color == Color.RED ? Color.BLACK : Color.RED), capturedPieceLocation);
+		board.placePiece(new King(color), pieceStart);
+		Move move = MoveUtil.createMove(board, pieceStart, pieceEnd);
+		assertTrue(move instanceof CornerJump);
+		assertTrue(Board.isMoveLegal(board, move));
+		assertTrue(Board.isMoveLegal(board, Arrays.asList(new CoordinatePair(pieceStart, pieceEnd))));
 		
 	}
 	
+	private static Stream<Arguments> backwardsCornerJumpCapturedPieceLocation() {
+	    return Stream.of(
+	      Arguments.of(6, 4, 6, 2, 7, 3, Color.BLACK),
+	      Arguments.of(6, 2, 6, 4, 7, 3, Color.RED),
+	      Arguments.of(1, 4, 1, 2, 0, 3, Color.BLACK),
+	      Arguments.of(1, 2, 1, 4, 0, 3, Color.RED)
+	    );
+	}
 	
-	// TODO test
-	@Test
-	public void flyingKingCanRainbowBackwards() {
-		
+	@ParameterizedTest
+	@MethodSource("backwardsRainbowJumpCapturedPieceLocation")
+	public void flyingKingCanRainbowBackwards(int startCol, int startRow, int endCol, int endRow, int capturedPieceCol, int capturedPieceRow, Color color) {
+		Coordinate pieceStart = new Coordinate(startCol, startRow);
+		Coordinate pieceEnd = new Coordinate(endCol, endRow);
+		Coordinate capturedPieceLocation = new Coordinate(capturedPieceCol, capturedPieceRow);
+		Board board = new Board();
+		board.clear();
+		board.placePiece(new Checker(color == Color.RED ? Color.BLACK : Color.RED), capturedPieceLocation);
+		board.placePiece(new King(color), pieceStart);
+		Move move = MoveUtil.createMove(board, pieceStart, pieceEnd);
+		assertTrue(move instanceof RainbowJump);
+		assertTrue(Board.isMoveLegal(board, move));
+		assertTrue(Board.isMoveLegal(board, Arrays.asList(new CoordinatePair(pieceStart, pieceEnd))));
+	}
+	
+	private static Stream<Arguments> backwardsRainbowJumpCapturedPieceLocation() {
+	    return Stream.of(
+	      Arguments.of(2, 6, 2, 2, 2, 4, Color.BLACK),
+	      Arguments.of(2, 2, 2, 6, 2, 4, Color.RED)
+	    );
 	}
 	
 	@ParameterizedTest
