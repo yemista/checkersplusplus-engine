@@ -41,7 +41,7 @@ public class Game {
     	Coordinate startSquare = coordinates.get(0).getStart();
     	Checker piece = board.getPiece(startSquare);
     	
-    	if (piece.getColor() != getCurrentMoveColor()) {
+    	if (piece != null  && piece.getColor() != getCurrentMoveColor()) {
     		return false;
     	}
     	

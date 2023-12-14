@@ -42,6 +42,10 @@ public class Board {
             }
         }
 	}
+    
+    public Checker[][] getBoard() {
+    	return board;
+    }
 
 	/**
      * Clears all pieces off the board. Should only be used for testing.
