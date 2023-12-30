@@ -120,7 +120,7 @@ public class Game {
 	}
 	
 	public Color getCurrentMoveColor() {
-		return (currentMove + 1) % 2 == 1 ? Color.BLACK : Color.RED;
+		return (currentMove) % 2 == 0 ? Color.BLACK : Color.RED;
 	}
 	
 	public int getCurrentMove() {

@@ -16,4 +16,9 @@ public class CoordinatePair {
 	public Coordinate getEnd() {
 		return end;
 	}
+	
+	@Override
+	public String toString() {
+		return String.format("start: %s | end: %s", start.toString(), end.toString());
+	}
 }
