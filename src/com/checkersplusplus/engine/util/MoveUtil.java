@@ -5,6 +5,7 @@ import com.checkersplusplus.engine.Coordinate;
 import com.checkersplusplus.engine.enums.MoveType;
 import com.checkersplusplus.engine.moves.CornerJump;
 import com.checkersplusplus.engine.moves.FlyingKing;
+import com.checkersplusplus.engine.moves.FlyingKingCornerJump;
 import com.checkersplusplus.engine.moves.ForwardMove;
 import com.checkersplusplus.engine.moves.InvalidMove;
 import com.checkersplusplus.engine.moves.Jump;
@@ -35,6 +36,9 @@ public class MoveUtil {
     	case FLYING_KING:
     		move = new FlyingKing(start, end);
     		break;
+    	case FLYING_KING_CORNER_JUMP:
+    		move = new FlyingKingCornerJump(start, end);
+    		break;
     	default:
     		move = new InvalidMove(start, end);
     	}
@@ -53,6 +57,10 @@ public class MoveUtil {
 		
 		if (RainbowJump.isValidRainbowJump(start, end)) {
 			return MoveType.RAINBOW_JUMP;
+		}
+		
+		if (FlyingKingCornerJump.isValidFlyingKingCornerJump(board, start, end)) {
+			return MoveType.FLYING_KING_CORNER_JUMP;
 		}
 		
 		if (CornerJump.isValidCornerJump(start, end)) {

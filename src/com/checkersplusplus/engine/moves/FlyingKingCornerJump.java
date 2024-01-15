@@ -8,11 +8,10 @@ import com.checkersplusplus.engine.pieces.King;
 
 public class FlyingKingCornerJump extends Move {
 
-	protected FlyingKingCornerJump(MoveType type, Coordinate start, Coordinate end) {
+	public FlyingKingCornerJump(Coordinate start, Coordinate end) {
 		super(MoveType.FLYING_KING_CORNER_JUMP, start, end);
-		// TODO Auto-generated constructor stub
 	}
-	
+
 	public static boolean isValidFlyingKingCornerJump(Board board, Coordinate start, Coordinate end) {
 		Checker playerPiece = board.getPiece(start);
 
@@ -20,7 +19,13 @@ public class FlyingKingCornerJump extends Move {
 			return false;	
 		}
 		
-		return Math.abs(start.getCol() - end.getCol()) == Math.abs(start.getRow() - end.getRow());
+		if (end.getCol() == 6 || end.getCol() == 1) {
+			if (Math.abs(Math.abs(end.getRow() - start.getRow()) - Math.abs(end.getCol() - start.getCol())) == 1) {
+				return true;
+			}
+		}
+		
+		return false;
 	}
 
 	@Override
@@ -30,7 +35,20 @@ public class FlyingKingCornerJump extends Move {
 
 	@Override
 	public Coordinate getCapturedPieceLocation() {
-		// TODO Auto-generated method stub
+		if (end.getCol() == 6) {
+			if (end.getRow() > start.getRow()) {
+				return new Coordinate(6, end.getRow() - 1);
+			} else {
+				return new Coordinate(6, end.getRow() + 1);
+			}
+		} else if (end.getCol() == 1) {
+			if (end.getRow() > start.getRow()) {
+				return new Coordinate(1, end.getRow() - 1);
+			} else {
+				return new Coordinate(1, end.getRow() + 1);
+			}
+		}
+		
 		return null;
 	}
 
