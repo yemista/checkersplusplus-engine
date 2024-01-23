@@ -58,6 +58,10 @@ public class TrainingOpponent {
 			}
 		}
 		
+		if (bestMoves.size() == 0) {
+			return new ArrayList<>();
+		}
+		 
 		Random r = new Random();
 		int randomIndex = r.nextInt(bestMoves.size());
 		return bestMoves.get(randomIndex);
