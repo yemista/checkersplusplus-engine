@@ -59,16 +59,16 @@ public class MoveUtil {
 			return MoveType.RAINBOW_JUMP;
 		}
 		
-		if (FlyingKingCornerJump.isValidFlyingKingCornerJump(board, start, end)) {
-			return MoveType.FLYING_KING_CORNER_JUMP;
-		}
-		
 		if (CornerJump.isValidCornerJump(start, end)) {
 			return MoveType.CORNER_JUMP;
 		}
 		
 		if (FlyingKing.isValidFlyingKing(board, start, end)) {
 			return MoveType.FLYING_KING;
+		}
+		
+		if (FlyingKingCornerJump.isValidFlyingKingCornerJump(board, start, end)) {
+			return MoveType.FLYING_KING_CORNER_JUMP;
 		}
 		
 		return MoveType.INVALID;

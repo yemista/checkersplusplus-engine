@@ -20,7 +20,36 @@ public class FlyingKingCornerJump extends Move {
 		}
 		
 		if (end.getCol() == 6 || end.getCol() == 1) {
-			if (Math.abs(Math.abs(end.getRow() - start.getRow()) - Math.abs(end.getCol() - start.getCol())) == 1) {
+			int colDirection = 0;
+			int rowDirection = 0;
+			
+			if (end.getCol() > start.getCol() && end.getRow() > start.getRow()) {
+				colDirection = 1;
+				rowDirection = 1;
+			} else if (end.getCol() > start.getCol() && end.getRow() < start.getRow()) {
+				colDirection = 1;
+				rowDirection = -1;
+			} else if (end.getCol() < start.getCol() && end.getRow() > start.getRow()) {
+				colDirection = -1;
+				rowDirection = 1;
+			} else {
+				colDirection = -1;
+				rowDirection = -1;
+			}
+			
+			int startRow = start.getRow();
+			int startCol = start.getCol();
+			
+			while (startCol < 7 && startCol > 0) {
+				startRow += rowDirection;
+				startCol += colDirection;
+				
+				if (startCol == 7 || startCol == 0) {
+					break;
+				}
+			}
+			
+			if (Math.abs(end.getRow() - startRow) == 1 && Math.abs(end.getCol() - startCol) == 1) {
 				return true;
 			}
 		}
@@ -37,19 +66,67 @@ public class FlyingKingCornerJump extends Move {
 	public Coordinate getCapturedPieceLocation() {
 		if (end.getCol() == 6) {
 			if (end.getRow() > start.getRow()) {
-				return new Coordinate(6, end.getRow() - 1);
+				return new Coordinate(7, end.getRow() - 1);
 			} else {
-				return new Coordinate(6, end.getRow() + 1);
+				return new Coordinate(7, end.getRow() + 1);
 			}
 		} else if (end.getCol() == 1) {
 			if (end.getRow() > start.getRow()) {
-				return new Coordinate(1, end.getRow() - 1);
+				return new Coordinate(0, end.getRow() - 1);
 			} else {
-				return new Coordinate(1, end.getRow() + 1);
+				return new Coordinate(0, end.getRow() + 1);
 			}
 		}
 		
 		return null;
+	}
+	
+	public boolean findObstructionsOnPath(Board board) {
+		int colDirection = 0;
+		int rowDirection = 0;
+		
+		if (end.getCol() > start.getCol() && end.getRow() > start.getRow()) {
+			colDirection = 1;
+			rowDirection = 1;
+		} else if (end.getCol() > start.getCol() && end.getRow() < start.getRow()) {
+			colDirection = 1;
+			rowDirection = -1;
+		} else if (end.getCol() < start.getCol() && end.getRow() > start.getRow()) {
+			colDirection = -1;
+			rowDirection = 1;
+		} else {
+			colDirection = -1;
+			rowDirection = -1;
+		}
+		
+		int obstructionCount = 0;
+		int startRow = start.getRow();
+		int startCol = start.getCol();
+		
+		while (startCol < 7 && startCol > 0) {
+			startRow += rowDirection;
+			startCol += colDirection;
+			
+			if (startCol == 7 || startCol == 0) {
+				break;
+			}
+		}
+		
+		Coordinate endOfBoard = new Coordinate(startCol, startRow);
+		
+		for (Coordinate checkLocation = new Coordinate(start.getCol() + colDirection, start.getRow() + rowDirection); 
+				!checkLocation.equals(endOfBoard);
+				checkLocation = new Coordinate(checkLocation.getCol() + colDirection, checkLocation.getRow() + rowDirection)) {
+			if (board.getPiece(checkLocation) != null) {
+				obstructionCount++;
+			}
+		}
+		
+		if (obstructionCount > 0) {
+			return true;
+		}
+		
+		return false;
 	}
 
 }

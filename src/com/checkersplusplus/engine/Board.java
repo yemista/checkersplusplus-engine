@@ -6,6 +6,7 @@ import java.util.List;
 import com.checkersplusplus.engine.enums.Color;
 import com.checkersplusplus.engine.enums.MoveType;
 import com.checkersplusplus.engine.moves.FlyingKing;
+import com.checkersplusplus.engine.moves.FlyingKingCornerJump;
 import com.checkersplusplus.engine.moves.Move;
 import com.checkersplusplus.engine.pieces.Checker;
 import com.checkersplusplus.engine.pieces.King;
@@ -201,8 +202,16 @@ public class Board {
         
         if (move.getMoveType() == MoveType.FLYING_KING) {
         	FlyingKing flyingKing = (FlyingKing) move;
+        	System.out.println("FLYINGKING");
+        	if (flyingKing.findObstructionsOnPath(workingBoard) || workingBoard.getPiece(flyingKing.getCapturedPieceLocation()) == null) {
+        		return false;
+        	}
+        }
+        
+        if (move.getMoveType() == MoveType.FLYING_KING_CORNER_JUMP) {
+        	FlyingKingCornerJump flyingKing = (FlyingKingCornerJump) move;
         	
-        	if (flyingKing.findObstructionsOnPath(workingBoard)) {
+        	if (flyingKing.findObstructionsOnPath(workingBoard) || workingBoard.getPiece(flyingKing.getCapturedPieceLocation()) == null) {
         		return false;
         	}
         }
@@ -254,7 +263,8 @@ public class Board {
 	private static boolean moveMustCapturePiece(Move move) {
     	return move.getMoveType() == MoveType.JUMP ||
         		move.getMoveType() == MoveType.RAINBOW_JUMP ||
-        		move.getMoveType() == MoveType.CORNER_JUMP;
+        		move.getMoveType() == MoveType.CORNER_JUMP ||
+        		move.getMoveType() == MoveType.FLYING_KING_CORNER_JUMP;
 	}
 	
 	public void commitMoves(List<CoordinatePair> coordinates) {
