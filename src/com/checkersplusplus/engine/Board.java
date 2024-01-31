@@ -202,7 +202,7 @@ public class Board {
         
         if (move.getMoveType() == MoveType.FLYING_KING) {
         	FlyingKing flyingKing = (FlyingKing) move;
-        	System.out.println("FLYINGKING");
+
         	if (flyingKing.findObstructionsOnPath(workingBoard) || workingBoard.getPiece(flyingKing.getCapturedPieceLocation()) == null) {
         		return false;
         	}

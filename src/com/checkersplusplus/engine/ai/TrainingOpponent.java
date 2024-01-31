@@ -124,7 +124,8 @@ public class TrainingOpponent {
 		moveList.addAll(generateJumps(pieceLocation, boardState));
 		moveList.addAll(generateRainbowJumps(pieceLocation, boardState));
 		moveList.addAll(generateCornerJumps(pieceLocation, boardState));
-		moveList.addAll(generateFlyingKings(pieceLocation, boardState, false));
+		moveList.addAll(generateFlyingKings(pieceLocation, boardState, true));
+		moveList.addAll(generateFlyingKingCornerJumps(pieceLocation, boardState));
 		return moveList;
 	}
 	
@@ -134,9 +135,10 @@ public class TrainingOpponent {
 		moveList.addAll(generateRainbowJumps(pieceLocation, boardState));
 		moveList.addAll(generateCornerJumps(pieceLocation, boardState));
 		moveList.addAll(generateFlyingKings(pieceLocation, boardState, true));
+		moveList.addAll(generateFlyingKingCornerJumps(pieceLocation, boardState));
 		return moveList;
 	}
-	
+
 	public static List<MoveChain> generatePossibleMoves(Coordinate pieceLocation, String boardState) {
 		List<MoveChain> moveList = generateInitialMoves(pieceLocation, boardState);	
 		List<MoveChain> startingNodes = new ArrayList<>();
@@ -159,6 +161,51 @@ public class TrainingOpponent {
 		}
 		
 		return startingNodes;
+	}
+	
+	private static List<MoveChain> generateFlyingKingCornerJumps(Coordinate pieceLocation, String boardState) {
+		List<MoveChain> moves = new ArrayList<>();
+		Board board = new Board(boardState);
+		Checker piece = board.getPiece(pieceLocation);
+		
+		if (!(piece instanceof King)) {
+			return moves;
+		}
+		
+		for (int col = pieceLocation.getCol(), row = pieceLocation.getRow(); 
+				col < BoardUtil.MAX_COLS && row < BoardUtil.MAX_ROWS; ++col, ++row) {
+			
+			if (col == 7) {
+				Coordinate endLocation = new Coordinate(6, row + 1);
+				addFlyingKingCornerJumpMoveIfValid(moves, board, pieceLocation, endLocation);
+			}
+		}
+		
+		for (int col = pieceLocation.getCol(), row = pieceLocation.getRow(); 
+				col >= 0 && row >= 0; --col, --row) {
+			if (col == 0) {
+				Coordinate endLocation = new Coordinate(1, row - 1);
+				addFlyingKingCornerJumpMoveIfValid(moves, board, pieceLocation, endLocation);
+			}
+		}
+		
+		for (int col = pieceLocation.getCol(), row = pieceLocation.getRow(); 
+				col >= 0 && row < BoardUtil.MAX_ROWS; --col, ++row) {
+			if (col == 0) {
+				Coordinate endLocation = new Coordinate(1, row + 1);
+				addFlyingKingCornerJumpMoveIfValid(moves, board, pieceLocation, endLocation);
+			}
+		}
+		
+		for (int col = pieceLocation.getCol(), row = pieceLocation.getRow(); 
+				col < BoardUtil.MAX_COLS && row >= 0; ++col, --row) {
+			if (col == 7) {
+				Coordinate endLocation = new Coordinate(6, row - 1);
+				addFlyingKingCornerJumpMoveIfValid(moves, board, pieceLocation, endLocation);
+			}
+		}
+		
+		return moves;
 	}
 
 	private static List<MoveChain> generateFlyingKings(Coordinate pieceLocation, String boardState, boolean mustCapture) {
@@ -195,6 +242,25 @@ public class TrainingOpponent {
 		}
 		
 		return moves;
+	}
+	
+	private static void addFlyingKingCornerJumpMoveIfValid(List<MoveChain> moves, Board board, Coordinate pieceLocation,
+			Coordinate endLocation) {
+		if (endLocation.equals(pieceLocation)) {
+			return;
+		}
+		
+		Move move = MoveUtil.createMove(board, pieceLocation, endLocation);
+		Coordinate capturedPieceLocation = move.getCapturedPieceLocation();
+		
+		if (!Board.isMoveLegal(board, move, true)) {
+			return;
+		}
+		
+		if(capturedPieceLocation != null && board.getPiece(capturedPieceLocation) != null
+				&& board.getPiece(capturedPieceLocation).getColor() != board.getPiece(pieceLocation).getColor()) {
+			moves.add(new MoveChain(move, board.getBoardState()));
+		}	
 	}
 
 	private static void addFlyingKingMoveIfValid(List<MoveChain> moves, Board board, Coordinate pieceLocation, Coordinate endLocation, boolean mustCapture) {
