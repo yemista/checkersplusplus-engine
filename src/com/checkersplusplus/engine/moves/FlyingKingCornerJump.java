@@ -19,6 +19,10 @@ public class FlyingKingCornerJump extends Move {
 			return false;	
 		}
 		
+		if (Math.abs(start.getCol() - end.getCol()) == Math.abs(start.getRow() - end.getRow())) {
+			return false;
+		}
+		
 		if (end.getCol() == 6 || end.getCol() == 1) {
 			int colDirection = 0;
 			int rowDirection = 0;
