@@ -369,7 +369,7 @@ public class TrainingOpponent {
 		Board board = new Board(boardState);
 		Checker checker = board.getPiece(pieceLocation);
 		
-		if (checker.getColor() == Color.BLACK) {
+		if (checker.getColor() == Color.BLACK || checker instanceof King) {
 			Move moveLeft = MoveUtil.createMove(board, pieceLocation, new Coordinate(pieceLocation.getCol() - 2, pieceLocation.getRow() + 2));
 			
 			if (Board.isMoveLegal(board, moveLeft, true)) {
@@ -383,7 +383,7 @@ public class TrainingOpponent {
 			}
 		}
 		
-		if (checker.getColor() == Color.RED) {
+		if (checker.getColor() == Color.RED || checker instanceof King) {
 			Move moveLeft = MoveUtil.createMove(board, pieceLocation, new Coordinate(pieceLocation.getCol() - 2, pieceLocation.getRow() - 2));
 			
 			if (Board.isMoveLegal(board, moveLeft, true)) {
@@ -405,7 +405,7 @@ public class TrainingOpponent {
 		Board board = new Board(boardState);
 		Checker checker = board.getPiece(pieceLocation);
 		
-		if (checker.getColor() == Color.BLACK) {
+		if (checker.getColor() == Color.BLACK || checker instanceof King) {
 			Move moveLeft = MoveUtil.createMove(board, pieceLocation, new Coordinate(pieceLocation.getCol() - 1, pieceLocation.getRow() + 1));
 			
 			if (Board.isMoveLegal(board, moveLeft)) {
@@ -419,7 +419,7 @@ public class TrainingOpponent {
 			}
 		}
 		
-		if (checker.getColor() == Color.RED) {
+		if (checker.getColor() == Color.RED || checker instanceof King) {
 			Move moveLeft = MoveUtil.createMove(board, pieceLocation, new Coordinate(pieceLocation.getCol() - 1, pieceLocation.getRow() - 1));
 			
 			if (Board.isMoveLegal(board, moveLeft)) {
