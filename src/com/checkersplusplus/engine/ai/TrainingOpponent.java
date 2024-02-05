@@ -15,6 +15,100 @@ import com.checkersplusplus.engine.util.BoardUtil;
 import com.checkersplusplus.engine.util.MoveUtil;
 
 public class TrainingOpponent {
+	
+	public static List<Move> getBestDeepMove(String boardState, Color color, int depth) {
+		if (depth == 1) {
+			return getBestMove(boardState, color);
+		}
+		
+		Board board = new Board(boardState);
+		List<MoveChain> allPossibleMoves = new ArrayList<>();
+		
+		for (int col = 0; col < BoardUtil.MAX_COLS; ++col) {
+			for (int row = 0; row < BoardUtil.MAX_ROWS; ++row) {
+				Coordinate pieceLocation = new Coordinate(col, row);
+				Checker piece = board.getPiece(pieceLocation);
+				
+				if (piece != null && piece.getColor() == color) {
+					List<MoveChain> moves = generatePossibleMoves(pieceLocation, boardState);
+					allPossibleMoves.addAll(moves);
+				}
+			}
+		}
+		
+		List<MoveAndScore> specificMoves = new ArrayList<>();
+		
+		for (MoveChain moveChain : allPossibleMoves) {
+			List<List<Move>> moves = createSpecificMovesFromMoveChain(moveChain);
+			
+			for (List<Move> move : moves) {
+				int score = getMoveScore(move, board.getBoardState());
+				Board latestBoard = applyMovesToBoardState(move, board.getBoardState());
+				specificMoves.add(new MoveAndScore(move, score, latestBoard.getBoardState()));	
+			}
+		}
+		
+		Color workingColor = color;
+		
+		for (int i = 0; i < depth; ++i) {
+			for (MoveAndScore specificMove : specificMoves) {
+				String moveScoreBoardState = specificMove.boardState;
+				List<Move> bestResponse = getBestMove(moveScoreBoardState, oppositeColor(workingColor));
+				int bestResponseScore = getMoveScore(bestResponse, moveScoreBoardState);
+				
+				if (oppositeColor(workingColor) != color) {
+					bestResponseScore = bestResponseScore * -1;
+				}
+				
+				specificMove.score += bestResponseScore;
+				Board updatedBoard = applyMovesToBoardState(bestResponse, moveScoreBoardState);
+				specificMove.boardState = updatedBoard.getBoardState();
+			}
+			
+			workingColor = oppositeColor(workingColor);
+		}
+		
+		MoveAndScore bestMove = null;
+		
+		for (MoveAndScore specificMove : specificMoves) {
+			if (bestMove == null) {
+				bestMove = specificMove;
+				continue;
+			}
+			
+			if (specificMove.score > bestMove.score) {
+				bestMove = specificMove;
+			}
+		}
+
+		return bestMove.move;
+	}
+	
+	private static class MoveAndScore {
+		public int score;
+		public String boardState;
+		public List<Move> move = new ArrayList<>();
+		
+		public MoveAndScore(List<Move> move, int score, String boardState) {
+			this.move.addAll(move);
+			this.score = score;
+			this.boardState = boardState;
+		}
+	}
+
+	private static Color oppositeColor(Color color) {
+		return Color.BLACK == color ? Color.RED : Color.BLACK;
+	}
+
+	private static Board applyMovesToBoardState(List<Move> moves, String boardState) {
+		Board board = new Board(boardState);
+		
+		for (Move move: moves) {
+			board.commitMove(move);
+		}
+		
+		return board;
+	}
 
 	public static List<Move> getBestMove(String boardState, Color color) {
 		Board board = new Board(boardState);
@@ -321,7 +415,7 @@ public class TrainingOpponent {
 		Board board = new Board(boardState);
 		Checker checker = board.getPiece(pieceLocation);
 		
-		if (checker.getColor() == Color.BLACK) {
+		if (checker.getColor() == Color.BLACK || checker instanceof King) {
 			Move moveLeft = MoveUtil.createMove(board, pieceLocation, new Coordinate(pieceLocation.getCol() - 4, pieceLocation.getRow()));
 			
 			if (Board.isMoveLegal(board, moveLeft, true)) {
@@ -341,7 +435,7 @@ public class TrainingOpponent {
 			}
 		}
 		
-		if (checker.getColor() == Color.RED) {
+		if (checker.getColor() == Color.RED || checker instanceof King) {
 			Move moveLeft = MoveUtil.createMove(board, pieceLocation, new Coordinate(pieceLocation.getCol() - 4, pieceLocation.getRow()));
 			
 			if (Board.isMoveLegal(board, moveLeft, true)) {
