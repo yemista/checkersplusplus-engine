@@ -48,6 +48,11 @@ public class TrainingOpponent {
 			}
 		}
 		
+		// Nothing to look ahead from.
+		if (specificMoves.isEmpty()) {
+			return new ArrayList<>();
+		}
+
 		Color workingColor = color;
 		
 		for (int i = 0; i < depth; ++i) {
@@ -79,6 +84,12 @@ public class TrainingOpponent {
 			if (specificMove.score > bestMove.score) {
 				bestMove = specificMove;
 			}
+		}
+
+		// Same contract as getBestMove: no legal move is an empty list, never null and
+		// never an exception. What a stuck player means is the caller's decision.
+		if (bestMove == null) {
+			return new ArrayList<>();
 		}
 
 		return bestMove.move;
@@ -133,21 +144,19 @@ public class TrainingOpponent {
 		}
 		
 		List<List<Move>> bestMoves = new ArrayList<>();
+		int bestScore = Integer.MIN_VALUE;
 		
+		// The first candidate used to be added, then compared against itself and added a
+		// second time, so it came up twice as often as any other move of equal score.
+		// Scoring each move once also takes this from O(n^2) to O(n).
 		for (List<Move> move : specificMoves) {
-			if (bestMoves.isEmpty()) {
-				bestMoves.add(move);
-			}
-			
-			int bestMoveScore = getMoveScore(bestMoves.get(0), boardState);
 			int moveScore = getMoveScore(move, boardState);
 			
-			if (moveScore == bestMoveScore) {
-				bestMoves.add(move);
-			}
-			
-			if (moveScore > bestMoveScore) {
+			if (moveScore > bestScore) {
+				bestScore = moveScore;
 				bestMoves.clear();
+				bestMoves.add(move);
+			} else if (moveScore == bestScore) {
 				bestMoves.add(move);
 			}
 		}
@@ -162,6 +171,13 @@ public class TrainingOpponent {
 	}
 	
 	private static int getMoveScore(List<Move> bestMove, String boardState) {
+		// A side with no legal move scores nothing. getBestMove returns an empty list for
+		// exactly that case and getBestDeepMove feeds its result straight back in here, so
+		// this has to be tolerated rather than indexed into.
+		if (bestMove == null || bestMove.isEmpty()) {
+			return 0;
+		}
+
 		Board board = new Board(boardState);
 		int score = 0;
 		boolean isKingInitially = board.getPiece(bestMove.get(0).getStart()) instanceof King;
@@ -391,6 +407,12 @@ public class TrainingOpponent {
 		Board board = new Board(boardState);
 		Checker checker = board.getPiece(pieceLocation);
 		
+		// Empty square: nothing to move. getPiece returns null rather than throwing, so
+		// without this the colour test below is a NullPointerException.
+		if (checker == null) {
+			return jumps;
+		}
+		
 		if (checker.getColor() == Color.BLACK || checker instanceof King) {
 			Move moveLeft = MoveUtil.createMove(board, pieceLocation, new Coordinate(pieceLocation.getCol(), pieceLocation.getRow() + 2));
 			
@@ -414,6 +436,12 @@ public class TrainingOpponent {
 		List<MoveChain> jumps = new ArrayList<>();
 		Board board = new Board(boardState);
 		Checker checker = board.getPiece(pieceLocation);
+		
+		// Empty square: nothing to move. getPiece returns null rather than throwing, so
+		// without this the colour test below is a NullPointerException.
+		if (checker == null) {
+			return jumps;
+		}
 		
 		if (checker.getColor() == Color.BLACK || checker instanceof King) {
 			Move moveLeft = MoveUtil.createMove(board, pieceLocation, new Coordinate(pieceLocation.getCol() - 4, pieceLocation.getRow()));
@@ -463,6 +491,12 @@ public class TrainingOpponent {
 		Board board = new Board(boardState);
 		Checker checker = board.getPiece(pieceLocation);
 		
+		// Empty square: nothing to move. getPiece returns null rather than throwing, so
+		// without this the colour test below is a NullPointerException.
+		if (checker == null) {
+			return jumps;
+		}
+		
 		if (checker.getColor() == Color.BLACK || checker instanceof King) {
 			Move moveLeft = MoveUtil.createMove(board, pieceLocation, new Coordinate(pieceLocation.getCol() - 2, pieceLocation.getRow() + 2));
 			
@@ -498,6 +532,12 @@ public class TrainingOpponent {
 		List<MoveChain> forwardMoves = new ArrayList<>();
 		Board board = new Board(boardState);
 		Checker checker = board.getPiece(pieceLocation);
+		
+		// Empty square: nothing to move. getPiece returns null rather than throwing, so
+		// without this the colour test below is a NullPointerException.
+		if (checker == null) {
+			return forwardMoves;
+		}
 		
 		if (checker.getColor() == Color.BLACK || checker instanceof King) {
 			Move moveLeft = MoveUtil.createMove(board, pieceLocation, new Coordinate(pieceLocation.getCol() - 1, pieceLocation.getRow() + 1));
